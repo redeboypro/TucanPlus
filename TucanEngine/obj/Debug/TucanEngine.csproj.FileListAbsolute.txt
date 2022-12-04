@@ -1,0 +1,10 @@
+D:\GameEngine\TucanPlus\TucanEngine\bin\Debug\TucanEngine.dll
+D:\GameEngine\TucanPlus\TucanEngine\bin\Debug\TucanEngine.pdb
+D:\GameEngine\TucanPlus\TucanEngine\bin\Debug\OpenTK.dll
+D:\GameEngine\TucanPlus\TucanEngine\bin\Debug\OpenTK.pdb
+D:\GameEngine\TucanPlus\TucanEngine\bin\Debug\OpenTK.xml
+D:\GameEngine\TucanPlus\TucanEngine\obj\Debug\TucanEngine.csprojAssemblyReference.cache
+D:\GameEngine\TucanPlus\TucanEngine\obj\Debug\TucanEngine.csproj.CoreCompileInputs.cache
+D:\GameEngine\TucanPlus\TucanEngine\obj\Debug\TucanEngine.csproj.CopyComplete
+D:\GameEngine\TucanPlus\TucanEngine\obj\Debug\TucanEngine.dll
+D:\GameEngine\TucanPlus\TucanEngine\obj\Debug\TucanEngine.pdb

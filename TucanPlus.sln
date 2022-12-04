@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TucanPlus", "TucanPlus\TucanPlus.csproj", "{CE02E224-A51F-4BAA-9C8C-7FEC9C3EC9AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TucanEngine", "TucanEngine\TucanEngine.csproj", "{061C135E-6B67-48B9-9375-80530EC3A47D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE02E224-A51F-4BAA-9C8C-7FEC9C3EC9AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE02E224-A51F-4BAA-9C8C-7FEC9C3EC9AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE02E224-A51F-4BAA-9C8C-7FEC9C3EC9AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE02E224-A51F-4BAA-9C8C-7FEC9C3EC9AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{061C135E-6B67-48B9-9375-80530EC3A47D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{061C135E-6B67-48B9-9375-80530EC3A47D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{061C135E-6B67-48B9-9375-80530EC3A47D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{061C135E-6B67-48B9-9375-80530EC3A47D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
