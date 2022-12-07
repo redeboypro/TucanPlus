@@ -47,7 +47,6 @@
         <Compile Include="Common\Math\MathBindings.cs" />
         <Compile Include="Common\Math\Ortho.cs" />
         <Compile Include="Display\Display.cs" />
-        <Compile Include="Gui\Button.cs" />
         <Compile Include="Gui\Font.cs" />
         <Compile Include="Gui\GuiElement.cs" />
         <Compile Include="Gui\GuiManager.cs" />
