@@ -1,16 +1,15 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using TucanEngine.Common.EventTranslation;
 using TucanEngine.Rendering.Tools.Common;
 
 namespace TucanEngine.Gui
 {
     public class Text2D : GuiElement
     {
-        private Font font;
         private string text;
 
-        public Text2D(Font font, string text) {
-            this.font = font;
+        public Text2D(string text) {
             this.text = text;
         }
 
@@ -20,17 +19,18 @@ namespace TucanEngine.Gui
             
             var guiManager = GuiManager.GetCurrentManagerInstance();
             var shaderProgram = guiManager.GetShaderProgram();
+            var font = guiManager.GetSkin().GetFont();
             
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, font.GetTexture().Texture);
             
-            for (var i = 0; i < text.Length; i++)
-            {
+            for (var i = 0; i < text.Length; i++) {
                 if (!Font.CharSheet.Contains(text[i].ToString())) continue;
-                var charWidth = RelativeSize.X / text.Length;
-                var matrix = 
-                    Matrix4.CreateScale(charWidth, RelativeSize.Y, 1) * 
-                    Matrix4.CreateTranslation(RelativeLocation.X + charWidth * i, RelativeLocation.Y, 0) * ModelMatrix;
+                var charWidth = LocalSpaceScale.X / text.Length;
+                var matrix = Matrix4.CreateScale(LocalSpaceScale.ScaleBy(charWidth, Axis.X)) *
+                             Matrix4.CreateFromQuaternion(LocalSpaceRotation) * 
+                             Matrix4.CreateTranslation(LocalSpaceLocation.AddUnit(charWidth * i, Axis.X))
+                             * GetModelMatrix();
                 
                 shaderProgram.SetUniform(ShaderNamingConstants.ModelMatrix, matrix);
                 shaderProgram.SetUniform(ShaderNamingConstants.IsStretched, false);
@@ -49,18 +49,10 @@ namespace TucanEngine.Gui
             GL.BindVertexArray(0);
         }
 
-        public Font GetFont() {
-            return font;
-        }
-        
         public string GetText() {
             return text;
         }
-        
-        public void SetFont(Font font) {
-            this.font = font;
-        }
-        
+
         public void SetText(string text) {
             this.text = text;
         }

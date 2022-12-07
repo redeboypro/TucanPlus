@@ -16,6 +16,7 @@ namespace TucanEngine.Display
     {
         private static Display currentDisplayInstance;
         private GuiManager guiManager;
+        private GuiSkin guiSkin;
 
         public Display() {
             Width = 800; Height = 600; 
@@ -42,15 +43,25 @@ namespace TucanEngine.Display
             #endregion
             
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            
-            guiManager = new GuiManager(new GuiShader());
-            var font = new Font(new Texture2D("font.png"));
-            
-            var text = guiManager.CreateGuiElement<Text2D>(new object[] { font, "Button" });
 
-            var button = guiManager.CreateGuiElement<Button>(new object[] { text, new Texture2D("btn.png"), true });
-            button.RelativeSize = new Vector2(0.35f, 0.1f);
+            guiSkin = new GuiSkin();
+            guiSkin.SetFont(new Texture2D("font.png"));
+            guiSkin.SetBoxTexture(new Texture2D("test.png"));
+            guiSkin.SetThumbTexture(new Texture2D("btn.png"));
+            guiManager = new GuiManager(guiSkin, new GuiShader());
             
+            var slider = guiManager.Slider(30, 100);
+            slider.LocalSpaceScale = new Vector3(0.5f, 0.1f, 1f);
+            slider.SetMovingEvent(args => {
+                Console.WriteLine("Slider value:" + slider.GetValue());
+            });
+            
+            var button = guiManager.Button(guiManager.Text("Button"), () => {
+                Console.WriteLine("Button clicked!");
+            });
+            button.LocalSpaceLocation = new Vector3(0, 0.15f, 0);
+            button.LocalSpaceScale = new Vector3(0.5f, 0.1f, 1f);
+
             guiManager.OnLoad(e);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
@@ -14,78 +15,104 @@ namespace TucanEngine.Gui
 // ReSharper disable InconsistentNaming
     public class GuiManager : IBehaviour
     {
-        public const int GridSize = 3;
-        private const float CellSize = 1f / GridSize;
-        
         private static GuiManager currentManagerInstance;
+        private GuiSkin skin;
         private List<GuiElement> guiElements = new List<GuiElement>();
+        
         private readonly ShaderProgram shaderProgram;
-
-        #region [ VAOs ]
         public readonly ArrayData QuadVAO = new ArrayData();
-        #endregion
 
-        public GuiManager(ShaderProgram shaderProgram) {
+        public GuiManager(GuiSkin skin, ShaderProgram shaderProgram) {
+            this.skin = skin;
             this.shaderProgram = shaderProgram;
             currentManagerInstance = this;
             BindVAOs();
         }
 
-        private void BindVAOs()
-        {
-            #region [ Bind quad vao ]
+        private void BindVAOs() {
             QuadVAO.Push(0, 2, PrimitiveData.QuadPositions, BufferTarget.ArrayBuffer);
             QuadVAO.Push(1, 2, PrimitiveData.QuadTextureCoordinates, BufferTarget.ArrayBuffer);
             QuadVAO.Create();
-            #endregion
         }
 
-        public T CreateGuiElement<T>(object[] parameters) where T : GuiElement {
-            var guiElement = (T)Activator.CreateInstance(typeof(T), parameters);
+        public Image2D Image(Texture2D textureData, bool isStretched = false) {
+            var guiElement = new Image2D(textureData, isStretched);
+            guiElements.Add(guiElement);
+            return guiElement;
+        }
+        
+        public Slider Slider(float min, float max) {
+            var guiElement = new Slider(min, max, skin);
+            guiElements.Add(guiElement);
+            return guiElement;
+        }
+        
+        public Image2D Button(GuiElement content, Action e) {
+            var guiElement = Image(skin.GetThumbTexture(), true);
+            content.SetParent(guiElement);
+            guiElement.AddPressEvent(e);
+            return guiElement;
+        }
+        
+        public Text2D Text(string text) {
+            var guiElement = new Text2D(text);
             guiElements.Add(guiElement);
             return guiElement;
         }
 
-        public static GuiManager GetCurrentManagerInstance() => currentManagerInstance;
-        public ShaderProgram GetShaderProgram() => shaderProgram;
-        
+        public static GuiManager GetCurrentManagerInstance() {
+            return currentManagerInstance;
+        }
+
+        public GuiSkin GetSkin() {
+            return skin;
+        }
+
+        public ShaderProgram GetShaderProgram() {
+            return shaderProgram;
+        }
+
         public void OnKeyDown(KeyboardKeyEventArgs e) {
-            foreach (var element in guiElements) element.OnKeyDown(e);
+            foreach (var element in guiElements) element?.OnKeyDown(e);
         }
 
         public void OnKeyUp(KeyboardKeyEventArgs e) {
-            foreach (var element in guiElements) element.OnKeyUp(e);
+            foreach (var element in guiElements) element?.OnKeyUp(e);
         }
 
         public void OnKeyPress(KeyPressEventArgs e) {
-            foreach (var element in guiElements) element.OnKeyPress(e);
+            foreach (var element in guiElements) element?.OnKeyPress(e);
         }
 
         public void OnMouseDown(MouseButtonEventArgs e) {
-            foreach (var element in guiElements) element.OnMouseDown(e);
+            foreach (var element in guiElements) element?.OnMouseDown(e);
         }
 
         public void OnMouseUp(MouseButtonEventArgs e) {
-            foreach (var element in guiElements) element.OnMouseUp(e);
+            foreach (var element in guiElements) element?.OnMouseUp(e);
         }
 
         public void OnMouseMove(MouseMoveEventArgs e) {
-            foreach (var element in guiElements) element.OnMouseMove(e);
+            foreach (var element in guiElements) element?.OnMouseMove(e);
         }
 
         public void OnLoad(EventArgs e) {
-            foreach (var element in guiElements) element.OnLoad(e);
+            foreach (var element in guiElements) element?.OnLoad(e);
         }
 
         public void OnUpdateFrame(FrameEventArgs e) {
-            foreach (var element in guiElements) element.OnUpdateFrame(e);
+            foreach (var element in guiElements) element?.OnUpdateFrame(e);
         }
 
         public void OnRenderFrame(FrameEventArgs e) {
             GL.Disable(EnableCap.DepthTest);
             for (var index = guiElements.Count - 1; index >= 0; index--) {
                 var element = guiElements[index];
-                element.OnRenderFrame(e);
+                
+                if (element != null && element.GetParent() == null) {
+                    element.OnRenderFrame(e);
+                    element.OnPostRender(e);
+                }
             }
             GL.Enable(EnableCap.DepthTest);
         }
