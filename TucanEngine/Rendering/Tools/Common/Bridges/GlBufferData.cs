@@ -2,13 +2,13 @@
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
 
-namespace TucanEngine.Rendering.Tools.Common
+namespace TucanEngine.Rendering.Tools.Common.Bridges
 {
-    public class BufferData<T> where T : struct
+    public class GlBufferData<T> where T : struct
     {
         public readonly int Id;
 
-        public BufferData(int location, int dim, T[] data, BufferTarget target) {
+        public GlBufferData(int location, int dim, T[] data, BufferTarget target) {
             GL.GenBuffers(1, out Id);
             GL.BindBuffer(target, Id);
             GL.BufferData(target, (IntPtr) (data.Length * Marshal.SizeOf<T>()), data, BufferUsageHint.DynamicDraw);

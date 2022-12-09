@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using TucanEngine.Common.Drawables;
-using TucanEngine.Main;
+using TucanEngine.Main.GameLogic;
 using TucanEngine.Rendering;
 using TucanEngine.Rendering.Tools;
-using TucanEngine.Rendering.Tools.Common;
+using TucanEngine.Rendering.Tools.Common.Bridges;
 
 namespace TucanEngine.Gui
 {
@@ -20,7 +19,7 @@ namespace TucanEngine.Gui
         private List<GuiElement> guiElements = new List<GuiElement>();
         
         private readonly ShaderProgram shaderProgram;
-        public readonly ArrayData QuadVAO = new ArrayData();
+        public readonly GlArrayData QuadVAO = new GlArrayData();
 
         public GuiManager(GuiSkin skin, ShaderProgram shaderProgram) {
             this.skin = skin;
@@ -41,8 +40,8 @@ namespace TucanEngine.Gui
             return guiElement;
         }
         
-        public Slider Slider(float min, float max) {
-            var guiElement = new Slider(min, max, skin);
+        public Slider Slider(float min, float max, Orientation orientation = Orientation.Horizontal) {
+            var guiElement = new Slider(min, max, orientation, skin);
             guiElements.Add(guiElement);
             return guiElement;
         }

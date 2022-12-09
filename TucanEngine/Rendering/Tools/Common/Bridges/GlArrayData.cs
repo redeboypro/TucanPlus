@@ -2,24 +2,23 @@
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 
-namespace TucanEngine.Rendering.Tools.Common
+namespace TucanEngine.Rendering.Tools.Common.Bridges
 {
-    public class ArrayData
+    public class GlArrayData
     {
-        public const int NoneId = -1;
-
         private int id;
         public int Id => id;
 
         private List<int> vbos = new List<int>();
         private List<Action> bindings = new List<Action>();
 
-        public int GetVboId(int dataLocation) => vbos[dataLocation];
+        public int GetBufferDataId(int dataLocation) {
+            return vbos[dataLocation];
+        }
 
         public void Push<T>(int location, int dim, T[] data, BufferTarget target) where T : struct {
-            bindings.Add(() =>
-            {
-                var vbo = new BufferData<T>(location, dim, data, target);
+            bindings.Add(() => {
+                var vbo = new GlBufferData<T>(location, dim, data, target);
                 vbos.Add(vbo.Id);
             });
         }
@@ -31,8 +30,7 @@ namespace TucanEngine.Rendering.Tools.Common
             GL.BindVertexArray(0);
         }
 
-        public void Delete()
-        {
+        public void Delete() {
             GL.BindVertexArray(id);
             foreach (var vbo in vbos) GL.DeleteBuffer(vbo);
             GL.DeleteVertexArray(id);

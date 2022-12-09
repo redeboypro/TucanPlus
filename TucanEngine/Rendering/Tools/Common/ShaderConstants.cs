@@ -1,6 +1,6 @@
 ﻿namespace TucanEngine.Rendering.Tools.Common
 {
-    public class ShaderNamingConstants
+    public static class ShaderNamingConstants
     {
         public const string MainColor = "color";
         public const string ModelMatrix = "modelMatrix";

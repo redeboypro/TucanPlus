@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using TucanEngine.Common.Drawables;
 using TucanEngine.Rendering;
-using TucanEngine.Rendering.Tools.Common;
+using TucanEngine.Rendering.Tools.Common.Bridges;
 
 namespace TucanEngine.Gui
 {
@@ -13,7 +13,7 @@ namespace TucanEngine.Gui
         public static readonly char[] Chars = CharSheet.ToCharArray();
 
         private Texture2D textureData;
-        private List<ArrayData> VAOs = new List<ArrayData>();
+        private List<GlArrayData> VAOs = new List<GlArrayData>();
 
         public Font(Texture2D textureData)
         {
@@ -36,7 +36,7 @@ namespace TucanEngine.Gui
                 textureCoords[1] = textureCoords[5] = top;
                 textureCoords[3] = textureCoords[7] = bottom;
 
-                var arrayData = new ArrayData();
+                var arrayData = new GlArrayData();
                 arrayData.Push(0, 2, PrimitiveData.QuadPositions, BufferTarget.ArrayBuffer);
                 arrayData.Push(1, 2, textureCoords, BufferTarget.ArrayBuffer);
                 arrayData.Create();
@@ -45,7 +45,7 @@ namespace TucanEngine.Gui
             }
         }
         
-        public ArrayData GetCharArrayData(char character) {
+        public GlArrayData GetCharArrayData(char character) {
             return VAOs[CharSheet.IndexOf(character)];
         }
         

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using OpenTK;
+using OpenTK.Input;
 using TucanEngine.Common.EventTranslation;
 using TucanEngine.Rendering;
 
@@ -17,8 +19,8 @@ namespace TucanEngine.Gui
         private Image2D thumb;
 
         private MouseMovingEvent movingEvent;
-        
-        public Slider(float min, float max, GuiSkin skin) : base(skin.GetBoxTexture(), true) {
+
+        public Slider(float min, float max, Orientation orientation, GuiSkin skin) : base(skin.GetBoxTexture(), true) {
             minValue = min;
             maxValue = max;
             currentValue = minValue;
@@ -26,7 +28,12 @@ namespace TucanEngine.Gui
             thumb = guiManager.Image(guiManager.GetSkin().GetThumbTexture(), true);
             thumb.SetParent(this);
             thumb.AddDragEvent(args => {
-                AddValue(args.XDelta);
+                AddValue(orientation switch
+                {
+                    Orientation.Horizontal => args.XDelta,
+                    Orientation.Vertical => args.YDelta,
+                    _ => throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null)
+                });
                 movingEvent?.Invoke(args);
             });
             RecalculateBounds();
@@ -41,6 +48,10 @@ namespace TucanEngine.Gui
         }
 
         public override void OnScaling() {
+            RecalculateBounds();
+        }
+        
+        public override void OnRotating() {
             RecalculateBounds();
         }
 

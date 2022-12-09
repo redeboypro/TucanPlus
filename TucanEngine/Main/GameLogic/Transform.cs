@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using OpenTK;
 using TucanEngine.Rendering;
 
-namespace TucanEngine.Main
+namespace TucanEngine.Main.GameLogic
 {
     public enum Space { Local, Global }
-    
+
     public abstract class Transform {
         private Transform parent;
         private List<Transform> children = new List<Transform>();
@@ -20,6 +20,8 @@ namespace TucanEngine.Main
         private Vector3 localScale = Vector3.One;
 
         private Matrix4 modelMatrix = Matrix4.Identity;
+        
+        private Vector3 min, max;
 
         #region [ World space transformation ]
         public Vector3 WorldSpaceLocation {
@@ -125,8 +127,8 @@ namespace TucanEngine.Main
         private void TransformMatrices(bool inverse) {
             var parentMatrix = parent?.GetModelMatrix() ?? Matrix4.Identity;
             if (!inverse) {
-                modelMatrix = parentMatrix * Matrix4.CreateScale(localScale) 
-                                           * Matrix4.CreateFromQuaternion(localRotation) 
+                modelMatrix = parentMatrix * Matrix4.CreateScale(localScale)
+                                           * Matrix4.CreateFromQuaternion(localRotation)
                                            * Matrix4.CreateTranslation(localLocation);
 
                 globalLocation = modelMatrix.ExtractTranslation();
@@ -134,7 +136,7 @@ namespace TucanEngine.Main
                 globalScale = modelMatrix.ExtractScale();
             }
             else {
-                var localMatrix = parentMatrix.Inverted() * Matrix4.CreateScale(globalScale) 
+                var localMatrix = parentMatrix.Inverted() * Matrix4.CreateScale(globalScale)
                                                           * Matrix4.CreateFromQuaternion(globalRotation)
                                                           * Matrix4.CreateTranslation(globalLocation);
 

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using TucanEngine.Common.Drawables;
 using TucanEngine.Gui;
 using TucanEngine.Rendering;
-using TucanEngine.Rendering.Tools;
-using Font = TucanEngine.Gui.Font;
+using TucanEngine.Main.GameLogic;
 
 namespace TucanEngine.Display
 {
@@ -50,17 +47,12 @@ namespace TucanEngine.Display
             guiSkin.SetThumbTexture(new Texture2D("btn.png"));
             guiManager = new GuiManager(guiSkin, new GuiShader());
             
-            var slider = guiManager.Slider(30, 100);
+            var slider = guiManager.Slider(30, 100, Orientation.Vertical);
             slider.LocalSpaceScale = new Vector3(0.5f, 0.1f, 1f);
             slider.SetMovingEvent(args => {
                 Console.WriteLine("Slider value:" + slider.GetValue());
             });
-            
-            var button = guiManager.Button(guiManager.Text("Button"), () => {
-                Console.WriteLine("Button clicked!");
-            });
-            button.LocalSpaceLocation = new Vector3(0, 0.15f, 0);
-            button.LocalSpaceScale = new Vector3(0.5f, 0.1f, 1f);
+            slider.LocalSpaceRotation = Quaternion.FromEulerAngles(0,0,MathHelper.DegreesToRadians(90));
 
             guiManager.OnLoad(e);
         }

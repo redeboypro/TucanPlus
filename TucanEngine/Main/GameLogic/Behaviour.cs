@@ -2,7 +2,7 @@
 using OpenTK;
 using OpenTK.Input;
 
-namespace TucanEngine.Main
+namespace TucanEngine.Main.GameLogic
 {
     public interface IBehaviour
     {

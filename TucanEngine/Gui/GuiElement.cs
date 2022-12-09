@@ -5,17 +5,18 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using TucanEngine.Common.EventTranslation;
-using TucanEngine.Main;
+using TucanEngine.Main.GameLogic;
 
 namespace TucanEngine.Gui
 {
+    public enum Orientation { Horizontal, Vertical }
     public delegate void MouseMovingEvent(MouseMoveEventArgs e);
     public abstract class GuiElement : Transform, IBehaviour
     {
         private List<MouseMovingEvent> dragEvents = new List<MouseMovingEvent>();
         private List<Action> pressEvents = new List<Action>();
         private List<Action> releaseEvents = new List<Action>();
-        
+
         private Color4 color = Color4.White;
         private bool isPressed;
         private bool isHighlighted;
