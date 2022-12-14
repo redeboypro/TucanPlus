@@ -21,6 +21,9 @@ namespace TucanEngine.Gui
         private bool isPressed;
         private bool isHighlighted;
 
+        private Vector3 min; 
+        private Vector3 max;
+
         public bool IsMasked { get; set; }
 
         public Color4 GetColor() {
@@ -50,7 +53,13 @@ namespace TucanEngine.Gui
         public override void OnScaling() { 
             base.OnScaling();
         }
-        
+
+        public override void OnTransformMatrices()
+        {
+            base.OnTransformMatrices();
+            RecalculateBounds();
+        }
+
         public virtual void OnKeyDown(KeyboardKeyEventArgs e) { }
         public virtual void OnKeyUp(KeyboardKeyEventArgs e) { }
         public virtual void OnKeyPress(KeyPressEventArgs e) { }
@@ -128,11 +137,30 @@ namespace TucanEngine.Gui
         
         private bool MouseIsInsideBounds(MouseEventArgs e) {
             var processedMouseCoordinates = Ortho.ToGlCoordinates(e.X, e.Y);
-            var higherCorner = WorldSpaceLocation + WorldSpaceScale;
-            return processedMouseCoordinates.X > WorldSpaceLocation.X &&
-                   processedMouseCoordinates.X < higherCorner.X &&
-                   processedMouseCoordinates.Y > WorldSpaceLocation.Y &&
-                   processedMouseCoordinates.Y < higherCorner.Y;
+            return processedMouseCoordinates.X > min.X &&
+                   processedMouseCoordinates.X < max.X &&
+                   processedMouseCoordinates.Y > min.Y &&
+                   processedMouseCoordinates.Y < max.Y;
+        }
+        
+        private void RecalculateBounds()
+        {
+            var angle = GetRotationAngle();
+            var angleSin = Math.Sin(angle);
+            var angleCos = Math.Cos(angle);
+            if (angleSin < 0) angleSin = -angleSin;
+            if (angleCos < 0) angleCos = -angleCos;
+            var width = WorldSpaceScale.Y * angleSin + WorldSpaceScale.X * angleCos;
+            var height = WorldSpaceScale.Y * angleCos + WorldSpaceScale.X * angleSin;
+            var halfExtent = new Vector3((float)width, (float)height, 0);
+            min = WorldSpaceLocation - halfExtent;
+            max = WorldSpaceLocation + halfExtent;
+        }
+        
+        public float GetRotationAngle() {
+            var t1 = 2.0f * (WorldSpaceRotation.W * WorldSpaceRotation.Z + WorldSpaceRotation.X * WorldSpaceRotation.Y);
+            var t2 = 1.0f - 2.0f * (WorldSpaceRotation.Y * WorldSpaceRotation.Y + WorldSpaceRotation.Z * WorldSpaceRotation.Z);
+            return (float)Math.Atan2(t1, t2);
         }
         
         public virtual void OnLoad(EventArgs e) { }

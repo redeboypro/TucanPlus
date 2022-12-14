@@ -42,6 +42,7 @@ namespace TucanEngine.Gui
         
         public Slider Slider(float min, float max, Orientation orientation = Orientation.Horizontal) {
             var guiElement = new Slider(min, max, orientation, skin);
+            guiElement.GetThumb().LocalSpaceLocation = -Vector3.UnitX;
             guiElements.Add(guiElement);
             return guiElement;
         }

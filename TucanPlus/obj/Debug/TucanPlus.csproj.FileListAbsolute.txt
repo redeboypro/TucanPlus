@@ -10,3 +10,15 @@ D:\GameEngine\TucanPlus\TucanPlus\bin\Debug\TucanEngine.pdb
 D:\GameEngine\TucanPlus\TucanPlus\bin\Debug\OpenTK.pdb
 D:\GameEngine\TucanPlus\TucanPlus\bin\Debug\OpenTK.xml
 D:\GameEngine\TucanPlus\TucanPlus\obj\Debug\TucanPlus.csproj.CopyComplete
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\TucanPlus.exe
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\TucanPlus.pdb
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\TucanEngine.dll
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\OpenTK.dll
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\TucanEngine.pdb
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\OpenTK.pdb
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\OpenTK.xml
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.csprojAssemblyReference.cache
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.csproj.CoreCompileInputs.cache
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.csproj.CopyComplete
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.exe
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.pdb

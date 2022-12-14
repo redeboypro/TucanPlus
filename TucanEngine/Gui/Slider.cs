@@ -10,67 +10,90 @@ namespace TucanEngine.Gui
     public class Slider : Image2D
     {
         private const float ThumbScaleFactor = 0.1f;
+        private const float BaseScaleFactor = 2.0f;
         
-        private float minValue;
-        private float maxValue;
+        private readonly float minValue;
+        private readonly float maxValue;
         private float currentValue;
         
         private float thumbTranslationUnit;
-        private Image2D thumb;
+        private readonly Image2D thumb;
 
-        private MouseMovingEvent movingEvent;
+        private readonly Orientation orientation;
+        private Action valueChangingEvent;
+
+        private int additionValueSign = 1;
 
         public Slider(float min, float max, Orientation orientation, GuiSkin skin) : base(skin.GetBoxTexture(), true) {
             minValue = min;
             maxValue = max;
             currentValue = minValue;
+            this.orientation = orientation;
             var guiManager = GuiManager.GetCurrentManagerInstance();
             thumb = guiManager.Image(guiManager.GetSkin().GetThumbTexture(), true);
             thumb.SetParent(this);
             thumb.AddDragEvent(args => {
-                AddValue(orientation switch
-                {
-                    Orientation.Horizontal => args.XDelta,
-                    Orientation.Vertical => args.YDelta,
-                    _ => throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null)
-                });
-                movingEvent?.Invoke(args);
+                AddValue(orientation == Orientation.Horizontal ? args.XDelta :
+                    orientation == Orientation.Vertical ? args.YDelta * -additionValueSign :
+                    throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null));
+                valueChangingEvent?.Invoke();
             });
             RecalculateBounds();
         }
 
         private void RecalculateBounds() {
             currentValue = minValue;
-            thumb.LocalSpaceLocation = Vector3.Zero;
             thumb.LocalSpaceScale = Vector3.One;
-            thumb.WorldSpaceScale = WorldSpaceScale.ScaleBy(ThumbScaleFactor, Axis.X);
-            thumbTranslationUnit = (WorldSpaceScale.X - thumb.WorldSpaceScale.X) / (maxValue - minValue);
+            thumb.WorldSpaceScale = WorldSpaceScale.ScaleBy(ThumbScaleFactor, (Axis) (int)orientation);
+            thumbTranslationUnit = (2) / (maxValue - minValue);
         }
 
         public override void OnScaling() {
             RecalculateBounds();
+            SetThumbStartLocation();
         }
         
         public override void OnRotating() {
             RecalculateBounds();
+            SetThumbStartLocation();
+            additionValueSign = Sign(MathHelper.RadiansToDegrees(GetRotationAngle()));
+        }
+
+        private void SetThumbStartLocation() {
+            thumb.LocalSpaceLocation = -Vector3.UnitX;
+        }
+        
+        private void SetThumbLocationByValue() {
+            thumb.LocalSpaceLocation = -Vector3.UnitX + Vector3.Zero
+                .SetUnit(thumbTranslationUnit * (currentValue - minValue), Axis.X);
+        }
+
+        private static int Sign(float value) {
+            value = Math.Sign(value);
+            if (value is 0) value = 1;
+            return (int)value;
         }
 
         public void SetValue(float value) {
             currentValue = MathHelper.Clamp(value, minValue, maxValue);
-            thumb.LocalSpaceLocation = thumb.LocalSpaceLocation
-                .SetUnit(thumbTranslationUnit * (currentValue - minValue), Axis.X);
+            SetThumbLocationByValue();
+            valueChangingEvent?.Invoke();
         }
         
         public void AddValue(float value) {
             SetValue(currentValue + value);
         }
         
-        public void SetMovingEvent(MouseMovingEvent action) {
-            movingEvent = action;
+        public void SetValueChangingEvent(Action action) {
+            valueChangingEvent = action;
         }
         
         public float GetValue() {
             return currentValue;
+        }
+
+        public Image2D GetThumb() {
+            return thumb;
         }
     }
 }

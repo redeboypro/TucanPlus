@@ -13,10 +13,10 @@
         
         #region [ 2D Primitives ]
         public static readonly float[] QuadPositions = { 
-                0.0f, 1.0f,
-                0.0f, 0.0f,
+                -1.0f, 1.0f,
+                -1.0f, -1.0f,
                 1.0f, 1.0f,
-                1.0f, 0.0f
+                1.0f, -1.0f
             };
         public static readonly float[] QuadTextureCoordinates = { 
             0.0f, 0.0f,

@@ -124,12 +124,12 @@ namespace TucanEngine.Main.GameLogic
             return modelMatrix;
         }
 
-        private void TransformMatrices(bool inverse) {
+        public void TransformMatrices(bool inverse) {
             var parentMatrix = parent?.GetModelMatrix() ?? Matrix4.Identity;
             if (!inverse) {
-                modelMatrix = parentMatrix * Matrix4.CreateScale(localScale)
-                                           * Matrix4.CreateFromQuaternion(localRotation)
-                                           * Matrix4.CreateTranslation(localLocation);
+                modelMatrix = Matrix4.CreateScale(localScale)
+                              * Matrix4.CreateFromQuaternion(localRotation)
+                              * Matrix4.CreateTranslation(localLocation) * parentMatrix;
 
                 globalLocation = modelMatrix.ExtractTranslation();
                 globalRotation = modelMatrix.ExtractRotation();
@@ -148,6 +148,8 @@ namespace TucanEngine.Main.GameLogic
             foreach (var child in children) {
                 child.TransformMatrices(false);
             }
+            
+            OnTransformMatrices();
         }
 
         public Quaternion GetLookRotation(Vector3 target, Vector3 upDirection, Space space = Space.Global) {
@@ -168,5 +170,6 @@ namespace TucanEngine.Main.GameLogic
         public virtual void OnMoving() { }
         public virtual void OnRotating() { }
         public virtual void OnScaling() { }
+        public virtual void OnTransformMatrices() { }
     }
 }
