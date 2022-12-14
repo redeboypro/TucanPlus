@@ -106,9 +106,8 @@ namespace TucanEngine.Gui
 
         public void OnRenderFrame(FrameEventArgs e) {
             GL.Disable(EnableCap.DepthTest);
-            for (var index = guiElements.Count - 1; index >= 0; index--) {
-                var element = guiElements[index];
-                
+            foreach (var element in guiElements)
+            {
                 if (element != null && element.GetParent() == null) {
                     element.OnRenderFrame(e);
                     element.OnPostRender(e);

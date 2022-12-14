@@ -7,6 +7,7 @@ namespace TucanEngine.Gui
 {
     public class Text2D : GuiElement
     {
+        private const float CharScaleFactor = 2.0f;
         private string text;
 
         public Text2D(string text) {
@@ -27,10 +28,11 @@ namespace TucanEngine.Gui
             for (var i = 0; i < text.Length; i++) {
                 if (!Font.CharSheet.Contains(text[i].ToString())) continue;
                 var charWidth = LocalSpaceScale.X / text.Length;
-                var matrix = Matrix4.CreateScale(LocalSpaceScale.ScaleBy(charWidth, Axis.X)) *
+                var matrix = Matrix4.CreateScale(LocalSpaceScale.ScaleBy(charWidth * CharScaleFactor, Axis.X)) *
                              Matrix4.CreateFromQuaternion(LocalSpaceRotation) * 
-                             Matrix4.CreateTranslation(LocalSpaceLocation.AddUnit(charWidth * i, Axis.X))
-                             * GetModelMatrix();
+                             Matrix4.CreateTranslation((-Vector3.UnitX)
+                                 .AddUnit(charWidth * (i + 1) * CharScaleFactor - charWidth / CharScaleFactor, Axis.X)) *
+                             GetModelMatrix();
                 
                 shaderProgram.SetUniform(ShaderNamingConstants.ModelMatrix, matrix);
                 shaderProgram.SetUniform(ShaderNamingConstants.IsStretched, false);

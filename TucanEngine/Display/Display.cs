@@ -47,11 +47,18 @@ namespace TucanEngine.Display
             guiSkin.SetThumbTexture(new Texture2D("btn.png"));
             guiManager = new GuiManager(guiSkin, new GuiShader());
             
-            var slider = guiManager.Slider(30, 100);
+            var slider = guiManager.Slider(0, 10);
             slider.LocalSpaceScale = new Vector3(0.2f, 0.05f, 1f);
             slider.SetValueChangingEvent(() => {
                 Console.WriteLine("Slider value:" + slider.GetValue());
             });
+            
+            var button = guiManager.Button(guiManager.Text("asdsaasdasd"), () => {
+                Console.WriteLine("Clicked");
+            });
+            button.LocalSpaceScale = new Vector3(0.5f, 0.05f, 1f);
+            button.LocalSpaceLocation = new Vector3(0.3f, -0.1f, 1);
+            
             guiManager.OnLoad(e);
         }
 
