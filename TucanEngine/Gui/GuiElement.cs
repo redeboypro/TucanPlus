@@ -6,6 +6,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using TucanEngine.Common.EventTranslation;
 using TucanEngine.Main.GameLogic;
+using TucanEngine.Main.GameLogic.Common;
 
 namespace TucanEngine.Gui
 {

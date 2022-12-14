@@ -45,15 +45,23 @@
     <Compile Include="Gui\Image2D.cs" />
     <Compile Include="Gui\Slider.cs" />
     <Compile Include="Gui\Text2D.cs" />
-    <Compile Include="Main\GameLogic\Behaviour.cs" />
+    <Compile Include="Main\GameLogic\Camera.cs" />
+    <Compile Include="Main\GameLogic\Common\Behaviour.cs" />
+    <Compile Include="Main\GameLogic\GameObject.cs" />
     <Compile Include="Main\GameLogic\Transform.cs" />
     <Compile Include="Main\Input.cs" />
+    <Compile Include="Pooling\ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\Components\MeshRenderer.cs" />
+    <Compile Include="Rendering\Mesh.cs" />
+    <Compile Include="Rendering\MeshShader.cs" />
     <Compile Include="Rendering\Texture2D.cs" />
     <Compile Include="Rendering\Tools\Common\Bridges\GlArrayData.cs" />
     <Compile Include="Rendering\Tools\Common\Bridges\GlBufferData.cs" />
     <Compile Include="Rendering\Tools\Common\ShaderConstants.cs" />
     <Compile Include="Rendering\Tools\ShaderProgram.cs" />
+    <Compile Include="Scene\Scene.cs" />
+    <Compile Include="Serialization\SerializedField.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenTK, Version=3.3.3.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">

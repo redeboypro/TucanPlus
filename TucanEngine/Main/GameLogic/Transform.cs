@@ -20,8 +20,6 @@ namespace TucanEngine.Main.GameLogic
         private Vector3 localScale = Vector3.One;
 
         private Matrix4 modelMatrix = Matrix4.Identity;
-        
-        private Vector3 min, max;
 
         #region [ World space transformation ]
         public Vector3 WorldSpaceLocation {
@@ -150,6 +148,13 @@ namespace TucanEngine.Main.GameLogic
             }
             
             OnTransformMatrices();
+        }
+
+        public void CopyFrom(Transform transform) {
+            parent = transform.parent;
+            LocalSpaceLocation = transform.LocalSpaceLocation;
+            LocalSpaceRotation = transform.LocalSpaceRotation;
+            LocalSpaceScale = transform.LocalSpaceScale;
         }
 
         public Quaternion GetLookRotation(Vector3 target, Vector3 upDirection, Space space = Space.Global) {

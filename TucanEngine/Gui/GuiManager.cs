@@ -4,7 +4,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using TucanEngine.Common.Drawables;
-using TucanEngine.Main.GameLogic;
+using TucanEngine.Main.GameLogic.Common;
 using TucanEngine.Rendering;
 using TucanEngine.Rendering.Tools;
 using TucanEngine.Rendering.Tools.Common.Bridges;
