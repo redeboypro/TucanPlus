@@ -45,7 +45,7 @@ namespace TucanEngine.Gui
             currentValue = minValue;
             thumb.LocalSpaceScale = Vector3.One;
             thumb.WorldSpaceScale = WorldSpaceScale.ScaleBy(ThumbScaleFactor, (Axis) (int)orientation);
-            thumbTranslationUnit = (2) / (maxValue - minValue);
+            thumbTranslationUnit = BaseScaleFactor / (maxValue - minValue);
         }
 
         public override void OnScaling() {
