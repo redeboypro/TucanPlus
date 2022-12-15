@@ -25,7 +25,7 @@ namespace TucanEngine.Main.GameLogic.Common
     public abstract class Behaviour
     {
         private GameObject assignedObject;
-        private bool isActive;
+        private bool isActive = true;
 
         public GameObject GetAssignedObject() {
             return assignedObject;

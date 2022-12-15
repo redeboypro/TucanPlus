@@ -4,6 +4,7 @@ namespace TucanEngine.Rendering
 {
     public class MeshShader : ShaderProgram
     {
+        private static MeshShader current;
         private const string VertexShaderCode = @"
 #version 150
 
@@ -13,13 +14,13 @@ in vec2 textureCoordinates;
 out vec3 colour;
 out vec2 pass_textureCoordinates;
 
-uniform mat4 transformationMatrix;
+uniform mat4 modelMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 
 void main(void){
 
-	gl_Position = projectionMatrix * viewMatrix * transformationMatrix * vec4(position,1.0);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0);
 	pass_textureCoordinates = textureCoordinates;
 }";
 
@@ -37,7 +38,13 @@ void main(void){
 	out_Color = texture(modelTexture,pass_textureCoordinates);
 }";
 
-        public MeshShader() : base(VertexShaderCode, FragmentShaderCode) { }
+        public MeshShader() : base(VertexShaderCode, FragmentShaderCode) {
+            current = this;
+        }
+
+        public static MeshShader GetCurrentShader() {
+            return current;
+        }
 
         protected override void BindAttributes() {
             BindAttribute(0, "position");

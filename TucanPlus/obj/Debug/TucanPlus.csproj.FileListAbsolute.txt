@@ -22,3 +22,5 @@ E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.csproj.
 E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.csproj.CopyComplete
 E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.exe
 E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\obj\Debug\TucanPlus.pdb
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\AssimpNet.dll
+E:\Development\RiderIDE\Projects\TucanPlus\TucanPlus\bin\Debug\AssimpNet.xml

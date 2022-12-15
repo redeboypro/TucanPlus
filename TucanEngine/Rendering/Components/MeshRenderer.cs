@@ -4,12 +4,17 @@ using OpenTK.Graphics.OpenGL;
 using TucanEngine.Gui;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Main.GameLogic.Common;
+using TucanEngine.Rendering.Tools.Common;
+using TucanEngine.Serialization;
 
 namespace TucanEngine.Rendering.Components
 {
     public class MeshRenderer : Behaviour
     {
+        [SerializedField]
         private Mesh mesh;
+        
+        [SerializedField]
         private Texture2D textureData;
 
         public Mesh GetMesh() {
@@ -33,23 +38,22 @@ namespace TucanEngine.Rendering.Components
             base.OnRenderFrame(e);
             if (mesh == null) return;
             
-            var guiManager = GuiManager.GetCurrentManagerInstance();
-            var shaderProgram = guiManager.GetShaderProgram();
+            var shaderProgram = MeshShader.GetCurrentShader();
             var gameObject = GetAssignedObject();
+            var camera = Camera.GetCurrentCameraInstance();
             
             GL.BindVertexArray(mesh.GetArrayData().Id);
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
 
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, textureData.Texture);
-            
-            if (gameObject.GetParent() is Camera) {
-                //Not implemented
+            if (textureData != null) {
+                GL.ActiveTexture(TextureUnit.Texture0);
+                GL.BindTexture(TextureTarget.Texture2D, textureData.Texture);
             }
-            else {
-                //Not implemented
-            }
+
+            shaderProgram.SetUniform(ShaderNamingConstants.ProjectionMatrix, camera.GetProjectionMatrix());
+            shaderProgram.SetUniform(ShaderNamingConstants.ViewMatrix, camera.GetViewMatrix());
+            shaderProgram.SetUniform(ShaderNamingConstants.ModelMatrix, gameObject.GetModelMatrix());
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);

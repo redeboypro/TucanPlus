@@ -18,3 +18,5 @@ E:\Development\RiderIDE\Projects\TucanPlus\TucanEngine\bin\Debug\OpenTK.dll
 E:\Development\RiderIDE\Projects\TucanPlus\TucanEngine\bin\Debug\OpenTK.pdb
 E:\Development\RiderIDE\Projects\TucanPlus\TucanEngine\bin\Debug\OpenTK.xml
 E:\Development\RiderIDE\Projects\TucanPlus\TucanEngine\obj\Debug\TucanEngine.csproj.CopyComplete
+E:\Development\RiderIDE\Projects\TucanPlus\TucanEngine\bin\Debug\AssimpNet.dll
+E:\Development\RiderIDE\Projects\TucanPlus\TucanEngine\bin\Debug\AssimpNet.xml

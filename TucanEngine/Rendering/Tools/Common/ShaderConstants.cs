@@ -6,5 +6,7 @@
         public const string ModelMatrix = "modelMatrix";
         public const string Dimensions = "dimensions";
         public const string IsStretched = "isStretched";
+        public const string ProjectionMatrix = "projectionMatrix";
+        public const string ViewMatrix = "viewMatrix";
     }
 }

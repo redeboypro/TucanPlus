@@ -11,6 +11,7 @@ namespace TucanEngine.Gui
     {
         private const float ThumbScaleFactor = 0.1f;
         private const float BaseScaleFactor = 2.0f;
+        private const float ThresholdFactor = 0.25f;
         
         private readonly float minValue;
         private readonly float maxValue;
@@ -33,8 +34,8 @@ namespace TucanEngine.Gui
             thumb = guiManager.Image(guiManager.GetSkin().GetThumbTexture(), true);
             thumb.SetParent(this);
             thumb.AddDragEvent(args => {
-                AddValue(orientation == Orientation.Horizontal ? args.XDelta :
-                    orientation == Orientation.Vertical ? args.YDelta * -additionValueSign :
+                AddValue(orientation == Orientation.Horizontal ? args.XDelta * ThresholdFactor :
+                    orientation == Orientation.Vertical ? args.YDelta * -additionValueSign * ThresholdFactor :
                     throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null));
                 valueChangingEvent?.Invoke();
             });

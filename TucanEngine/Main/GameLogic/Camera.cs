@@ -6,6 +6,8 @@ namespace TucanEngine.Main.GameLogic
 {
     public class Camera : GameObject
     {
+        private const float NearClip = 0.01f;
+        private const float FarClip = 1000.0f;
         private static Camera current;
         
         private Vector3 forwardDirection = -Vector3.UnitZ;
@@ -21,7 +23,7 @@ namespace TucanEngine.Main.GameLogic
         public Camera(float fieldOfView = MathHelper.PiOver4) {
             current = this;
             var display = Display.Display.GetCurrent();
-            projection = Matrix4.CreatePerspectiveFieldOfView(fieldOfView, display.Width / (float)display.Height, 0.01f, 1000.0f);
+            projection = Matrix4.CreatePerspectiveFieldOfView(fieldOfView, display.Width / (float)display.Height, NearClip, FarClip);
             UpdateDirections();
         }
 
@@ -90,16 +92,16 @@ namespace TucanEngine.Main.GameLogic
             forwardDirection.Normalize();
             rightDirection = Vector3.Normalize(Vector3.Cross(forwardDirection, Vector3.UnitY));
             upDirection = Vector3.Normalize(Vector3.Cross(rightDirection, forwardDirection));
-            UpdateTransformMatrix();
+            UpdateViewMatrix();
         }
         
-        private void UpdateTransformMatrix() {
+        private void UpdateViewMatrix() {
             viewMatrix = Matrix4.LookAt(WorldSpaceLocation, WorldSpaceLocation + forwardDirection, upDirection);
         }
 
         public override void OnTransformMatrices() {
             base.OnTransformMatrices();
-            UpdateTransformMatrix();
+            UpdateViewMatrix();
         }
 
         public static Camera GetCurrentCameraInstance() {

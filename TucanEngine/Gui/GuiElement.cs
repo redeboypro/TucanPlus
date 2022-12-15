@@ -77,8 +77,8 @@ namespace TucanEngine.Gui
         }
         
         public virtual void OnMouseMove(MouseMoveEventArgs e) {
+            if (isPressed) OnDrag(e);
             if (MouseIsInsideBounds(e)) {
-                if (isPressed) OnDrag(e);
                 if (isHighlighted) return;
                 OnFocus();
                 isHighlighted = true;

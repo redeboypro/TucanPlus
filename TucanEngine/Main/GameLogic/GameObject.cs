@@ -11,7 +11,7 @@ namespace TucanEngine.Main.GameLogic
 {
     public class GameObject : Transform, IBehaviour, IDisposable
     {
-        private List<Behaviour> behaviours = new List<Behaviour>();
+        private readonly List<Behaviour> behaviours = new List<Behaviour>();
         private bool isActive;
         private int index;
 
@@ -41,7 +41,7 @@ namespace TucanEngine.Main.GameLogic
             behaviours.Add(behaviourInstance);
         }
         
-        public void AddBehaviour(ref Behaviour behaviour) {
+        public void AddBehaviour(Behaviour behaviour) {
             behaviour.AssignObject(this);
             behaviours.Add(behaviour);
         }
@@ -119,16 +119,17 @@ namespace TucanEngine.Main.GameLogic
             objectClone.SetActive(isActive);
             objectClone.CopyFrom(this);
             foreach (var behaviour in behaviours) {
-                var fields = behaviour.GetType().GetFields()
+                var fields = behaviour.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                     .Where(field => Attribute.IsDefined(field, typeof(SerializedField)))
                     .ToDictionary(field => field.Name, field => field.GetValue(behaviour));
                 
                 var behaviourClone = (Behaviour) Activator.CreateInstance(behaviour.GetType());
-                foreach (var field in behaviourClone.GetType().GetFields()) {
-                    if (Attribute.IsDefined(field, typeof(SerializedField))) 
+                foreach (var field in behaviourClone.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)) {
+                    if (Attribute.IsDefined(field, typeof(SerializedField))) {
                         field.SetValue(behaviourClone, fields[field.Name]);
+                    }
                 }
-                objectClone.AddBehaviour(ref behaviourClone);
+                objectClone.AddBehaviour(behaviourClone);
             }
             for (var i = 0; i < GetChildCount(); i++) {
                 objectClone.AddChild(((GameObject) GetChild(i)).Clone());

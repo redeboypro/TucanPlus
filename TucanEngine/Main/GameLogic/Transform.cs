@@ -122,8 +122,19 @@ namespace TucanEngine.Main.GameLogic
             return modelMatrix;
         }
 
+        public Matrix4 GetParentMatrix() {
+            switch (parent) {
+                case null:
+                    return Matrix4.Identity;
+                case Camera camera: 
+                    return camera.GetViewMatrix();
+                default: 
+                    return parent.GetModelMatrix();
+            }
+        }
+
         public void TransformMatrices(bool inverse) {
-            var parentMatrix = parent?.GetModelMatrix() ?? Matrix4.Identity;
+            var parentMatrix = GetParentMatrix();
             if (!inverse) {
                 modelMatrix = Matrix4.CreateScale(localScale)
                               * Matrix4.CreateFromQuaternion(localRotation)

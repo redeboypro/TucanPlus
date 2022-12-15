@@ -38,10 +38,10 @@ namespace TucanEngine.Scene
             }
         }
 
-        public void InstantiateFromPool(string tag, Vector3 location, Quaternion rotation, Vector3 scale) {
+        public GameObject InstantiateFromPool(string tag, Vector3 location, Quaternion rotation, Vector3 scale) {
             if (!root.ContainsKey(tag)) {
                 Console.WriteLine($"Pool \"{tag}\" doesn't exist");
-                return;
+                return null;
             }
             var queue = root[tag];
             var objectInstance = queue.Dequeue();
@@ -51,6 +51,7 @@ namespace TucanEngine.Scene
             objectInstance.WorldSpaceScale = scale;
             objectInstance.OnAwake();
             queue.Enqueue(objectInstance);
+            return objectInstance;
         }
 
         public Queue<GameObject> FindPoolByTag(string tag) {
