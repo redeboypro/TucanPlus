@@ -2,7 +2,7 @@
 using Assimp;
 using Assimp.Configs;
 using OpenTK;
-using TucanEngine.Common.EventTranslation;
+using TucanEngine.Common.Math;
 using Mesh = TucanEngine.Rendering.Mesh;
 
 namespace TucanEngine.AssimpImplementation

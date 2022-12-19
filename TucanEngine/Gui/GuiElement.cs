@@ -4,7 +4,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using TucanEngine.Common.EventTranslation;
+using TucanEngine.Common.Math;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Main.GameLogic.Common;
 

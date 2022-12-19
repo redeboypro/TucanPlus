@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using TucanEngine.Common.EventTranslation;
+using TucanEngine.Common.Math;
 using TucanEngine.Rendering.Tools.Common;
 
 namespace TucanEngine.Gui

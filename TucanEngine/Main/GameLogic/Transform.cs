@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OpenTK;
-using TucanEngine.Common.EventTranslation;
-using TucanEngine.Rendering;
+using TucanEngine.Common.Math;
 
 namespace TucanEngine.Main.GameLogic
 {
@@ -137,15 +135,6 @@ namespace TucanEngine.Main.GameLogic
             return parent;
         }
 
-        public Quaternion GetTransformedRotation() {
-            var parentRotation = Quaternion.Identity;
-            if (parent != null) {
-                parentRotation = parent.GetTransformedRotation();
-            }
-
-            return parentRotation * localRotation;
-        }
-
         public Matrix4 GetModelMatrix() {
             return modelMatrix;
         }
@@ -173,7 +162,7 @@ namespace TucanEngine.Main.GameLogic
             return WorldSpaceRotation.Right();
         }
 
-        public virtual void TransformMatrices(bool inverse) {
+        public void TransformMatrices(bool inverse) {
             var parentMatrix = GetParentMatrix();
             if (!inverse) {
                 modelMatrix = Matrix4.CreateScale(localScale)
@@ -211,21 +200,13 @@ namespace TucanEngine.Main.GameLogic
             LocalSpaceScale = transform.LocalSpaceScale;
         }
 
-        public Quaternion GetLookRotation(Vector3 target, Vector3 upDirection, Space space = Space.Global) {
-            return Matrix4.LookAt(space is Space.Global ? globalLocation : localLocation, target, upDirection).ExtractRotation();
+        public void LookAt(Vector3 target, Vector3 up) {
+            if (target == Vector3.Zero) {
+                target = MathBindings.EpsilonVector;
+            }
+            WorldSpaceRotation = MathBindings.GetLookRotation((target - WorldSpaceLocation).Normalized(), up);
         }
 
-        public void LookAt(Vector3 target, Vector3 upDirection, Space space = Space.Global) {
-            var lookRotation = GetLookRotation(target, upDirection, space);
-            switch (space) {
-                case Space.Global: globalRotation = lookRotation; 
-                    break;
-                case Space.Local: localRotation = lookRotation; 
-                    break;
-                default: throw new ArgumentOutOfRangeException(nameof(space), space, null);
-            }
-        }
-        
         public void Rotate(Quaternion rotation) {
             LocalSpaceRotation = rotation * localRotation;
         }

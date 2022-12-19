@@ -40,6 +40,14 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
                 if (Input.IsKeyDown(Key.D)) {
                     cameraGameObject.WorldSpaceLocation -= cameraGameObject.Right() * (float)e.Time * MovementSpeed;
                 }
+                
+                if (Input.IsKeyDown(Key.Space)) {
+                    cameraGameObject.WorldSpaceLocation += Vector3.UnitY * (float)e.Time * MovementSpeed;
+                }
+
+                if (Input.IsKeyDown(Key.ShiftLeft)) {
+                    cameraGameObject.WorldSpaceLocation -= Vector3.UnitY * (float)e.Time * MovementSpeed;
+                }
             }
 
             pitch += MathHelper.DegreesToRadians(Input.GetMouseDeltaY() * (float)e.Time * Sensitivity);

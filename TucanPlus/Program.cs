@@ -1,14 +1,9 @@
-﻿using System;
-using OpenTK;
-using OpenTK.Input;
+﻿using OpenTK;
 using TucanEngine.AssimpImplementation;
-using TucanEngine.Common.EventTranslation;
 using TucanEngine.Display;
 using TucanEngine.Gui;
-using TucanEngine.Main;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Main.GameLogic.BasicComponents;
-using TucanEngine.Main.GameLogic.Common;
 using TucanEngine.Pooling;
 using TucanEngine.Rendering;
 using TucanEngine.Rendering.Components;
@@ -40,7 +35,7 @@ namespace TucanPlus
                 var instance2 = scene.InstantiateFromPool(TemporaryTag, Vector3.UnitZ * 5 + Vector3.UnitX, Quaternion.Identity, Vector3.One);
                 scene.GetCamera().AddBehaviour<FreeCameraController>();
                 instance.SetParent(scene.GetCamera());
-                
+
                 instance.LocalSpaceRotation = Quaternion.FromEulerAngles(
                     MathHelper.DegreesToRadians(90),
                     MathHelper.DegreesToRadians(-90),

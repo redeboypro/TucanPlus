@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using OpenTK;
 using OpenTK.Input;
-using TucanEngine.Common.EventTranslation;
+using TucanEngine.Common.Math;
 using TucanEngine.Rendering;
 
 namespace TucanEngine.Gui

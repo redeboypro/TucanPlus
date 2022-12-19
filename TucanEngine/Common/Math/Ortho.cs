@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace TucanEngine.Common.EventTranslation
+namespace TucanEngine.Common.Math
 {
     public static class Ortho
     {

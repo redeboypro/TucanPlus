@@ -1,6 +1,6 @@
 ﻿using System;
 using OpenTK;
-using TucanEngine.Common.EventTranslation;
+using TucanEngine.Common.Math;
 using TucanEngine.Main.GameLogic.Common;
 
 namespace TucanEngine.Main.GameLogic
