@@ -8,6 +8,12 @@ namespace TucanEngine.Common.EventTranslation
     public enum Axis { X, Y, Z }
     public static class MathBindings
     {
+        #region [ Matrix4 bindings ]
+        public static Matrix4 CreateRotation(this Matrix4 matrix, float pitch, float yaw, float roll) {
+            return Matrix4.CreateRotationX(pitch) + Matrix4.CreateRotationY(yaw) * Matrix4.CreateRotationZ(roll);
+        }
+        #endregion
+        
         #region [ Quaternion bindings ]
         public static Vector3 ToEulerAngles(this Quaternion quaternion) {
             const float edge = 0.4995f;
@@ -55,6 +61,22 @@ namespace TucanEngine.Common.EventTranslation
             }
             
             return angle;
+        }
+        
+        public static Vector3[] GetDirectionVectors(this Quaternion quaternion) {
+            return GetDirectionVectors(quaternion.ToEulerAngles());
+        }
+        
+        public static Vector3 Right(this Quaternion quaternion) {
+            return quaternion * Vector3.UnitX;
+        }
+        
+        public static Vector3 Up(this Quaternion quaternion) {
+            return quaternion * Vector3.UnitY;
+        }
+        
+        public static Vector3 Forward(this Quaternion quaternion) {
+            return quaternion * Vector3.UnitZ;
         }
         #endregion
         
@@ -107,6 +129,27 @@ namespace TucanEngine.Common.EventTranslation
             tmpVector.Y = vector.Y;
             tmpVector.Z = vector.Z;
             return tmpVector;
+        }
+        
+        public static Vector3[] GetDirectionVectors(this Vector3 eulerAngles) {
+            return CalculateDirectionVectors(eulerAngles.X, eulerAngles.Y);
+        }
+        
+        public static Vector3[] CalculateDirectionVectors(float pitch, float yaw) {
+            var directions = new []{ -Vector3.UnitZ, Vector3.UnitX, Vector3.UnitY };
+            directions[0].X = (float)Math.Cos(pitch) * (float)Math.Cos(yaw);
+            directions[0].Y = (float)Math.Sin(pitch);
+            directions[0].Z = (float)Math.Cos(pitch) * (float)Math.Sin(yaw);
+            directions[0].Normalize();
+            directions[2] = Vector3.Normalize(Vector3.Cross(directions[0], Vector3.UnitY));
+            directions[1] = Vector3.Normalize(Vector3.Cross(directions[2], directions[0]));
+            return directions;
+        }
+
+        public static Vector3 Transform(this Vector3 vector, Matrix4 matrix) {
+            var toVector4 = new Vector4(vector.X, vector.Y, vector.Z, 1.0f);
+            Vector4.Transform(ref toVector4, ref matrix, out toVector4);
+            return toVector4.Xyz;
         }
         #endregion
     }

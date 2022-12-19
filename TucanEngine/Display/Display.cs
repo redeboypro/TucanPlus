@@ -4,6 +4,8 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using TucanEngine.Gui;
+using TucanEngine.Main;
+using TucanEngine.Main.GameLogic;
 using TucanEngine.Scene;
 using TucanEngine.Rendering;
 
@@ -52,11 +54,12 @@ namespace TucanEngine.Display
             guiSkin.SetBoxTexture(new Texture2D("resources\\box.png"));
             guiSkin.SetThumbTexture(new Texture2D("resources\\thumb.png"));
             guiManager = new GuiManager(guiSkin, new GuiShader());
-            scene = new Scene.Scene();
             meshShader = new MeshShader();
             loadEvent?.Invoke();
+            scene = Scene.Scene.GetCurrentScene();
             scene.OnLoad(e);
             guiManager.OnLoad(e);
+            Input.OnLoad();
         }
 
         protected override void OnResize(EventArgs e) {
@@ -66,6 +69,7 @@ namespace TucanEngine.Display
 
         protected override void OnUpdateFrame(FrameEventArgs e) {
             base.OnUpdateFrame(e);
+            Input.OnUpdateFrame();
             scene.OnUpdateFrame(e);
             guiManager.OnUpdateFrame(e);
         }
@@ -74,7 +78,7 @@ namespace TucanEngine.Display
             base.OnRenderFrame(e);
             GL.ClearColor(Color4.CornflowerBlue);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            
+
             meshShader.Start();
             scene.OnRenderFrame(e);
             

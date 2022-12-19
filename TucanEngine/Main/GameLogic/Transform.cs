@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenTK;
+using TucanEngine.Common.EventTranslation;
 using TucanEngine.Rendering;
 
 namespace TucanEngine.Main.GameLogic
@@ -40,6 +41,15 @@ namespace TucanEngine.Main.GameLogic
             }
         }
         
+        public Vector3 WorldSpaceEulerAngles {
+            get => globalRotation.ToEulerAngles();
+            set {
+                WorldSpaceRotation = Quaternion.FromEulerAngles(value);
+                TransformMatrices(false);
+                OnRotating();
+            }
+        }
+        
         public Vector3 WorldSpaceScale {
             get => globalScale;
             set {
@@ -64,6 +74,15 @@ namespace TucanEngine.Main.GameLogic
             get => localRotation;
             set {
                 localRotation = value;
+                TransformMatrices(false);
+                OnRotating();
+            }
+        }
+        
+        public Vector3 LocalSpaceEulerAngles {
+            get => localRotation.ToEulerAngles();
+            set {
+                localRotation = Quaternion.FromEulerAngles(value);
                 TransformMatrices(false);
                 OnRotating();
             }
@@ -118,6 +137,15 @@ namespace TucanEngine.Main.GameLogic
             return parent;
         }
 
+        public Quaternion GetTransformedRotation() {
+            var parentRotation = Quaternion.Identity;
+            if (parent != null) {
+                parentRotation = parent.GetTransformedRotation();
+            }
+
+            return parentRotation * localRotation;
+        }
+
         public Matrix4 GetModelMatrix() {
             return modelMatrix;
         }
@@ -126,14 +154,26 @@ namespace TucanEngine.Main.GameLogic
             switch (parent) {
                 case null:
                     return Matrix4.Identity;
-                case Camera camera: 
-                    return camera.GetViewMatrix();
+                case Camera camera:
+                    return camera.GetViewMatrix().Inverted();
                 default: 
                     return parent.GetModelMatrix();
             }
         }
+        
+        public Vector3 Forward() {
+            return WorldSpaceRotation.Forward();
+        }
+        
+        public Vector3 Up() {
+            return WorldSpaceRotation.Up();
+        }
+        
+        public Vector3 Right() {
+            return WorldSpaceRotation.Right();
+        }
 
-        public void TransformMatrices(bool inverse) {
+        public virtual void TransformMatrices(bool inverse) {
             var parentMatrix = GetParentMatrix();
             if (!inverse) {
                 modelMatrix = Matrix4.CreateScale(localScale)
@@ -153,12 +193,15 @@ namespace TucanEngine.Main.GameLogic
                 LocalSpaceRotation = localMatrix.ExtractRotation();
                 LocalSpaceScale = localMatrix.ExtractScale();
             }
+            
+            UpdateChildren();
+            OnTransformMatrices();
+        }
 
+        public void UpdateChildren() {
             foreach (var child in children) {
                 child.TransformMatrices(false);
             }
-            
-            OnTransformMatrices();
         }
 
         public void CopyFrom(Transform transform) {
@@ -181,6 +224,14 @@ namespace TucanEngine.Main.GameLogic
                     break;
                 default: throw new ArgumentOutOfRangeException(nameof(space), space, null);
             }
+        }
+        
+        public void Rotate(Quaternion rotation) {
+            LocalSpaceRotation = rotation * localRotation;
+        }
+        
+        public void Rotate(float angle, Vector3 axis) {
+            Rotate(Quaternion.FromAxisAngle(axis, angle));
         }
 
         public virtual void OnMoving() { }

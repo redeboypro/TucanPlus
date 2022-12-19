@@ -16,6 +16,9 @@ namespace TucanEngine.Rendering.Components
         
         [SerializedField]
         private Texture2D textureData;
+        
+        [SerializedField]
+        private bool ignoreCameraTransformation;
 
         public Mesh GetMesh() {
             return mesh;
@@ -23,6 +26,10 @@ namespace TucanEngine.Rendering.Components
         
         public Texture2D GetTexture() {
             return textureData;
+        }
+        
+        public bool IgnoreCameraTransformation() {
+            return ignoreCameraTransformation;
         }
 
         public void SetMesh(Mesh mesh) {
@@ -33,14 +40,19 @@ namespace TucanEngine.Rendering.Components
             this.textureData = textureData;
         }
         
+        public void SetToIgnoreCameraTransformation(bool state) {
+            ignoreCameraTransformation = state;
+        }
+        
         public override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
             if (mesh == null) return;
-            
+
+            var scene = Scene.Scene.GetCurrentScene();
             var shaderProgram = MeshShader.GetCurrentShader();
             var gameObject = GetAssignedObject();
-            var camera = Camera.GetCurrentCameraInstance();
+            var camera = scene.GetCamera();
             
             GL.BindVertexArray(mesh.GetArrayData().Id);
             GL.EnableVertexAttribArray(0);

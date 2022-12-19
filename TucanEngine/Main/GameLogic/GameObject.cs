@@ -12,11 +12,20 @@ namespace TucanEngine.Main.GameLogic
     public class GameObject : Transform, IBehaviour, IDisposable
     {
         private readonly List<Behaviour> behaviours = new List<Behaviour>();
+        private readonly int layer;
         private bool isActive;
         private int index;
 
+        public GameObject(int layer = 0) {
+            this.layer = layer;
+        }
+
         public int GetIndex() {
             return index;
+        }
+        
+        public int GetLayer() {
+            return layer;
         }
 
         public bool IsActive() {
@@ -115,7 +124,7 @@ namespace TucanEngine.Main.GameLogic
         }
 
         public GameObject Clone() {
-            var objectClone = new GameObject();
+            var objectClone = new GameObject(layer);
             objectClone.SetActive(isActive);
             objectClone.CopyFrom(this);
             foreach (var behaviour in behaviours) {
