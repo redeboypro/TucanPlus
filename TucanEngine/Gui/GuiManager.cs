@@ -110,7 +110,6 @@ namespace TucanEngine.Gui
             {
                 if (element != null && element.GetParent() == null) {
                     element.OnRenderFrame(e);
-                    element.OnPostRender(e);
                 }
             }
             GL.Enable(EnableCap.DepthTest);

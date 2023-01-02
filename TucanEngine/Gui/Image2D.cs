@@ -36,6 +36,8 @@ namespace TucanEngine.Gui {
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
             GL.BindVertexArray(0);
+            
+            base.OnRenderFrame(e);
         }
     }
 }

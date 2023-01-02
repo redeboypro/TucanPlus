@@ -44,6 +44,7 @@
     <Compile Include="Gui\GuiShader.cs" />
     <Compile Include="Gui\GuiSkin.cs" />
     <Compile Include="Gui\Image2D.cs" />
+    <Compile Include="Gui\ListBox.cs" />
     <Compile Include="Gui\Slider.cs" />
     <Compile Include="Gui\Text2D.cs" />
     <Compile Include="Main\GameLogic\BasicComponents\FreeCameraController.cs" />

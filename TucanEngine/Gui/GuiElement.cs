@@ -14,16 +14,16 @@ namespace TucanEngine.Gui
     public delegate void MouseMovingEvent(MouseMoveEventArgs e);
     public abstract class GuiElement : Transform, IBehaviour
     {
-        private List<MouseMovingEvent> dragEvents = new List<MouseMovingEvent>();
-        private List<Action> pressEvents = new List<Action>();
-        private List<Action> releaseEvents = new List<Action>();
+        private readonly List<MouseMovingEvent> dragEvents = new List<MouseMovingEvent>();
+        private readonly List<Action> pressEvents = new List<Action>();
+        private readonly List<Action> releaseEvents = new List<Action>();
 
         private Color4 color = Color4.White;
+        private Vector3 boundsMin;
+        private Vector3 boundsMax;
+        
         private bool isPressed;
         private bool isHighlighted;
-
-        private Vector3 min; 
-        private Vector3 max;
 
         public bool IsMasked { get; set; }
 
@@ -55,25 +55,38 @@ namespace TucanEngine.Gui
             base.OnScaling();
         }
 
-        public override void OnTransformMatrices()
-        {
+        public override void OnTransformMatrices() {
             base.OnTransformMatrices();
             RecalculateBounds();
+            InvokeInChildren(nameof(OnTransformMatrices));
         }
 
-        public virtual void OnKeyDown(KeyboardKeyEventArgs e) { }
-        public virtual void OnKeyUp(KeyboardKeyEventArgs e) { }
-        public virtual void OnKeyPress(KeyPressEventArgs e) { }
+        public virtual void OnKeyDown(KeyboardKeyEventArgs e) {
+            InvokeInChildren(nameof(OnUpdateFrame));
+        }
+
+        public virtual void OnKeyUp(KeyboardKeyEventArgs e) {
+            InvokeInChildren(nameof(OnUpdateFrame));
+        }
+
+        public virtual void OnKeyPress(KeyPressEventArgs e) {
+            InvokeInChildren(nameof(OnUpdateFrame));
+        }
+        
         public virtual void OnMouseDown(MouseButtonEventArgs e) {
             if (!MouseIsInsideBounds(e)) return;
             OnPress();
             isPressed = true;
+            InvokeInChildren(nameof(OnMouseDown));
         }
         
         public virtual void OnMouseUp(MouseButtonEventArgs e) {
             isPressed = false;
-            if (!MouseIsInsideBounds(e)) return;
+            if (!MouseIsInsideBounds(e)) {
+                return;
+            }
             OnRelease();
+            InvokeInChildren(nameof(OnMouseUp));
         }
         
         public virtual void OnMouseMove(MouseMoveEventArgs e) {
@@ -88,6 +101,50 @@ namespace TucanEngine.Gui
                 isHighlighted = false;
                 OnOutOfFocus();
             }
+            InvokeInChildren(nameof(OnMouseMove));
+        }
+
+        public virtual void OnPress() {
+            foreach (var action in pressEvents) {
+                action.Invoke();
+            }
+            InvokeInChildren(nameof(OnPress));
+        }
+        
+        public virtual void OnRelease() {
+            foreach (var action in releaseEvents) {
+                action.Invoke();
+            }
+            InvokeInChildren(nameof(OnRelease));
+        }
+        
+        public virtual void OnDrag(MouseMoveEventArgs e) {
+            foreach (var action in dragEvents) {
+                action.Invoke(e);
+            }
+            InvokeInChildren(nameof(OnDrag));
+        }
+
+        public virtual void OnLoad(EventArgs e) {
+            InvokeInChildren(nameof(OnLoad));
+        }
+
+        public virtual void OnUpdateFrame(FrameEventArgs e) {
+            InvokeInChildren(nameof(OnUpdateFrame));
+        }
+
+        public virtual void OnRenderFrame(FrameEventArgs e)
+        {
+            var scissorLocation = Ortho.ToScreenCoordinates(LocalSpaceLocation.X, LocalSpaceLocation.Y);
+            var scissorSize = Ortho.ToScreenCoordinates(LocalSpaceScale.X - 1,  LocalSpaceScale.Y - 1);
+            
+            if (IsMasked) {
+                GL.Scissor((int) scissorLocation.X, (int) scissorLocation.Y, (int) scissorSize.X, (int) scissorSize.Y);
+                GL.Enable(EnableCap.ScissorTest);
+            }
+
+            InvokeInChildren(nameof(OnRenderFrame));
+            if (IsMasked) GL.Disable(EnableCap.ScissorTest);
         }
         
         public void AddPressEvent(Action e) {
@@ -114,74 +171,46 @@ namespace TucanEngine.Gui
             dragEvents.Remove(e);
         }
         
-        public virtual void OnPress() {
-            foreach (var action in pressEvents) {
-                action.Invoke();
-            }
-        }
-        
-        public virtual void OnRelease() {
-            foreach (var action in releaseEvents) {
-                action.Invoke();
-            }
-        }
-        
-        public virtual void OnDrag(MouseMoveEventArgs e) {
-            foreach (var action in dragEvents) {
-                action.Invoke(e);
-            }
-        }
-        
         public virtual void OnFocus() { }
-        
+
         public virtual void OnOutOfFocus() { }
-        
-        private bool MouseIsInsideBounds(MouseEventArgs e) {
-            var processedMouseCoordinates = Ortho.ToGlCoordinates(e.X, e.Y);
-            return processedMouseCoordinates.X > min.X &&
-                   processedMouseCoordinates.X < max.X &&
-                   processedMouseCoordinates.Y > min.Y &&
-                   processedMouseCoordinates.Y < max.Y;
+
+        public void InvokeInChildren(string methodName) {
+            for (var index = 0; index < GetChildCount(); index++) {
+                var child = (GuiElement)GetChild(index);
+                child.GetType().GetMethod(methodName)?.Invoke(child, null);
+                child.InvokeInChildren(methodName);
+            }
         }
         
-        private void RecalculateBounds()
-        {
+        private void RecalculateBounds() {
             var angle = GetRotationAngle();
             var angleSin = Math.Sin(angle);
             var angleCos = Math.Cos(angle);
+            
             if (angleSin < 0) angleSin = -angleSin;
             if (angleCos < 0) angleCos = -angleCos;
+            
             var width = WorldSpaceScale.Y * angleSin + WorldSpaceScale.X * angleCos;
             var height = WorldSpaceScale.Y * angleCos + WorldSpaceScale.X * angleSin;
+            
             var halfExtent = new Vector3((float)width, (float)height, 0);
-            min = WorldSpaceLocation - halfExtent;
-            max = WorldSpaceLocation + halfExtent;
+            boundsMin = WorldSpaceLocation - halfExtent;
+            boundsMax = WorldSpaceLocation + halfExtent;
         }
         
         public float GetRotationAngle() {
             var t1 = 2.0f * (WorldSpaceRotation.W * WorldSpaceRotation.Z + WorldSpaceRotation.X * WorldSpaceRotation.Y);
             var t2 = 1.0f - 2.0f * (WorldSpaceRotation.Y * WorldSpaceRotation.Y + WorldSpaceRotation.Z * WorldSpaceRotation.Z);
-            return (float)Math.Atan2(t1, t2);
+            return (float) Math.Atan2(t1, t2);
         }
         
-        public virtual void OnLoad(EventArgs e) { }
-        public virtual void OnUpdateFrame(FrameEventArgs e) { }
-        public virtual void OnRenderFrame(FrameEventArgs e) { }
-
-        public virtual void OnPostRender(FrameEventArgs e) {
-            var scissorLocation = Ortho.ToScreenCoordinates(LocalSpaceLocation.X, LocalSpaceLocation.Y);
-            var scissorSize = Ortho.ToScreenCoordinates(LocalSpaceScale.X - 1,  LocalSpaceScale.Y - 1);
-            
-            if (IsMasked) {
-                GL.Scissor((int) scissorLocation.X, (int) scissorLocation.Y, (int) scissorSize.X, (int) scissorSize.Y);
-                GL.Enable(EnableCap.ScissorTest);
-            }
-
-            for (var index = 0; index < GetChildCount(); index++) {
-                ((GuiElement) GetChild(index)).OnRenderFrame(e);
-            }
-
-            if (IsMasked) GL.Disable(EnableCap.ScissorTest);
+        private bool MouseIsInsideBounds(MouseEventArgs e) {
+            var processedMouseCoordinates = Ortho.ToGlCoordinates(e.X, e.Y);
+            return processedMouseCoordinates.X > boundsMin.X &&
+                   processedMouseCoordinates.X < boundsMax.X &&
+                   processedMouseCoordinates.Y > boundsMin.Y &&
+                   processedMouseCoordinates.Y < boundsMax.Y;
         }
     }
 }

@@ -14,10 +14,7 @@ namespace TucanEngine.Gui
             this.text = text;
         }
 
-        public override void OnRenderFrame(FrameEventArgs e)
-        {
-            base.OnRenderFrame(e);
-            
+        public override void OnRenderFrame(FrameEventArgs e) {
             var guiManager = GuiManager.GetCurrentManagerInstance();
             var shaderProgram = guiManager.GetShaderProgram();
             var font = guiManager.GetSkin().GetFont();
@@ -49,6 +46,7 @@ namespace TucanEngine.Gui
             }
             
             GL.BindVertexArray(0);
+            base.OnRenderFrame(e);
         }
 
         public string GetText() {
