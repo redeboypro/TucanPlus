@@ -24,8 +24,10 @@ namespace TucanPlus
                 var guiManager = GuiManager.GetCurrentManagerInstance();
 
                 var poolSource = new GameObject();
+                
                 var mesh = ModelLoader.LoadFromFile("ak47.obj");
                 var texture = new Texture2D("ak47.png");
+                
                 var meshRenderer = new MeshRenderer();
                 meshRenderer.AssignObject(poolSource);
                 meshRenderer.SetMesh(mesh);

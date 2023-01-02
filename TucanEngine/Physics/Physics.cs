@@ -48,11 +48,11 @@ namespace TucanEngine.Physics
                     minTranslation.X = distance.X * Math.Sign(correctionDistance.X);
                 }
 
-                if(distance.Y > distance.X && distance.Y > distance.Z){
+                if(distance.Y > distance.X && distance.Y > distance.Z) {
                     minTranslation.Y = distance.Y * Math.Sign(correctionDistance.Y);
                 }
                 
-                if (distance.Z > distance.Y && distance.Z > distance.X){
+                if (distance.Z > distance.Y && distance.Z > distance.X) {
                     minTranslation.Z = distance.Z * Math.Sign(correctionDistance.Z);
                 }
                 return true;
