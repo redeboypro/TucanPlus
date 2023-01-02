@@ -43,7 +43,7 @@ namespace TucanEngine.Physics.Shapes
 
         public void Transform(Transform transform) {
             for (var i = 0; i < VertexCount; i++) {
-                sharedVertices[i] = vertices[i].Transform(transform.GetModelMatrix());
+                sharedVertices[i] = transform.WorldSpaceRotation * (vertices[i] * transform.WorldSpaceScale) + transform.WorldSpaceLocation;;
             }
             
             var triangleEdge1 = sharedVertices[1] - sharedVertices[0];

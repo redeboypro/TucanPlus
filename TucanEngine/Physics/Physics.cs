@@ -15,18 +15,18 @@ namespace TucanEngine.Physics
     
     public static class Physics
     {
-        private static readonly List<IShape> shapes = new List<IShape>();
+        private static readonly List<IShape> Shapes = new List<IShape>();
 
         public static void Add(IShape shape) {
-            shapes.Add(shape);
+            Shapes.Add(shape);
         }
         
         public static IShape GetShapeByIndex(int index) {
-            return shapes[index];
+            return Shapes[index];
         }
         
         public static int GetShapeCount() {
-            return shapes.Count;
+            return Shapes.Count;
         }
 
         public static bool BoxBoxIntersection(Box boxA, Box boxB, out Vector3 minTranslation) {
@@ -166,7 +166,7 @@ namespace TucanEngine.Physics
             hitInfo = (start + direction, null);
             var intersects = false;
             
-            foreach (var shape in shapes) {
+            foreach (var shape in Shapes) {
                 if (shape.Raycast(start, direction, out var hitPoint)) {
                     intersects = true;
                     if (Vector3.Distance(start, hitPoint) < Vector3.Distance(start, hitInfo.Item1)) {
