@@ -25,9 +25,69 @@ namespace TucanEngine.Scene
                 layers[index] = new Dictionary<string, Queue<GameObject>>();
             }
         }
+        
+        #region [ Deprecated common indexers ]
+        [Obsolete("Indexer is deprecated, please use Find(string name) or FindMultiple(string name)")]
+        public GameObject[] this[string name] => 
+            (from layer in layers
+                from queue in layer.Values
+                from obj in queue
+                where obj.GetName().Equals(name) select obj)
+            .ToArray();
+
+        [Obsolete("Indexer is deprecated, please use Find<T>() or FindMultiple<T>()")]
+        public GameObject[] this[Type type] => 
+            (from layer in layers 
+                from queue in layer.Values
+                from obj in queue
+                where obj.GetBehaviour(type) != null select obj)
+            .ToArray();
+        #endregion
+
+        public GameObject Find(string name) {
+            foreach (var layer in layers) {
+                foreach (var obj in 
+                    from queue in layer.Values
+                    from obj in queue
+                    where obj.GetName().Equals(name) select obj) {
+                    return obj;
+                }
+            }
+
+            throw new Exception("Can't find " + name);
+        }
+        
+        public GameObject Find<T>() where T : Behaviour {
+            foreach (var layer in layers) {
+                foreach (var obj in 
+                    from queue in layer.Values
+                    from obj in queue
+                    where obj.GetBehaviour<T>() != null select obj) {
+                    return obj;
+                }
+            }
+
+            throw new Exception("Can't find object with" + typeof(T).Name + " component");
+        }
+        
+        public GameObject[] FindMultiple(string name) {
+            return this[name];
+        }
+        
+        public GameObject[] FindMultiple<T>() where T : Behaviour {
+            return this[typeof(T)];
+        }
 
         public void PushPool(ObjectPool<GameObject> pool) {
             pools.Add(pool);
+        }
+        
+        public void PushPool(string tag, GameObject prefab, int capacity) {
+            PushPool(new ObjectPool<GameObject>(tag, prefab, capacity));
+        }
+
+        public Queue<GameObject> FindPoolByTag(string tag, int layer = 0) {
+            return layers[layer][tag];
         }
 
         public void FillPools() {
@@ -39,6 +99,7 @@ namespace TucanEngine.Scene
                     var objectInstance = source.Clone();
                     objectInstance.SetActive(false);
                     objectInstance.SetIndex(queue.Count);
+                    objectInstance.SetName(source.GetName() + $"({i})");
                     queue.Enqueue(objectInstance);
                 }
                 layers[source.GetLayer()].Add(pool.GetTag(), queue);
@@ -60,10 +121,6 @@ namespace TucanEngine.Scene
             objectInstance.OnAwake();
             queue.Enqueue(objectInstance);
             return objectInstance;
-        }
-
-        public Queue<GameObject> FindPoolByTag(string tag, int layer = 0) {
-            return layers[layer][tag];
         }
 
         public void OnKeyDown(KeyboardKeyEventArgs e) {

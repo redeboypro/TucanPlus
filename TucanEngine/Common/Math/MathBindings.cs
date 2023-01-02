@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Assimp;
 using OpenTK;
 using Quaternion = OpenTK.Quaternion;
@@ -12,6 +13,16 @@ namespace TucanEngine.Common.Math
         #region [ Matrix4 bindings ]
         public static Matrix4 CreateRotation(this Matrix4 matrix, float pitch, float yaw, float roll) {
             return Matrix4.CreateRotationX(pitch) + Matrix4.CreateRotationY(yaw) * Matrix4.CreateRotationZ(roll);
+        }
+        #endregion
+
+        #region [ Matrix4x4 bindings ]
+        public static Vector3 MultiplyPoint3x4(this Matrix4 matrix, Vector3 vector) {
+            Vector3 transformedVector;
+            transformedVector.X = matrix.M11 * vector.X + matrix.M12 * vector.Y + matrix.M13 * vector.Z + matrix.M14;
+            transformedVector.Y = matrix.M21 * vector.X + matrix.M22 * vector.Y + matrix.M23 * vector.Z + matrix.M24;
+            transformedVector.Z = matrix.M31 * vector.X + matrix.M32 * vector.Y + matrix.M33 * vector.Z + matrix.M34;
+            return transformedVector;
         }
         #endregion
         
@@ -210,6 +221,33 @@ namespace TucanEngine.Common.Math
             var toVector4 = new Vector4(vector.X, vector.Y, vector.Z, 1.0f);
             Vector4.Transform(ref toVector4, ref matrix, out toVector4);
             return toVector4.Xyz;
+        }
+
+        public static (Vector3, Vector3) GetBounds(IEnumerable<Vector3> points) {
+            var min = Vector3.One * float.PositiveInfinity;
+            var max = Vector3.One * float.NegativeInfinity;
+            foreach (var point in points) {
+                if (point.X < min.X) {
+                    min.X = point.X;
+                }
+                if (point.Y < min.Y) {
+                    min.Y = point.Y;
+                }
+                if (point.Z < min.Z) {
+                    min.Z = point.Z;
+                }
+                if (point.X > max.X) {
+                    min.X = point.X;
+                }
+                if (point.Y > max.Y) {
+                    min.Y = point.Y;
+                }
+                if (point.Z > max.Z) {
+                    min.Z = point.Z;
+                }
+            }
+            
+            return (min, max);
         }
         #endregion
     }

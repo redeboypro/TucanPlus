@@ -15,6 +15,7 @@ namespace TucanEngine.Main.GameLogic
         private readonly int layer;
         private bool isActive;
         private int index;
+        private string name;
 
         public GameObject(int layer = 0) {
             this.layer = layer;
@@ -22,6 +23,10 @@ namespace TucanEngine.Main.GameLogic
 
         public int GetIndex() {
             return index;
+        }
+        
+        public string GetName() {
+            return name;
         }
         
         public int GetLayer() {
@@ -35,11 +40,24 @@ namespace TucanEngine.Main.GameLogic
         public void SetIndex(int index) {
             this.index = index;
         }
+        
+        public void SetName(string name) {
+            this.name = name;
+        }
 
         public T GetBehaviour<T>() where T : Behaviour {
             foreach (var behaviour in behaviours
                 .Where(behaviour => behaviour.GetType().IsAssignableFrom(typeof(T)))) {
                 return (T) behaviour;
+            }
+            throw new Exception("Behavior cannot be found!");
+        }
+        
+        [Obsolete("Method is deprecated, please use GetBehaviour<T>()")]
+        public Behaviour GetBehaviour(Type type) {
+            foreach (var behaviour in behaviours
+                .Where(behaviour => behaviour.GetType().IsAssignableFrom(type))) {
+                return behaviour;
             }
             throw new Exception("Behavior cannot be found!");
         }
@@ -127,6 +145,7 @@ namespace TucanEngine.Main.GameLogic
             var objectClone = new GameObject(layer);
             objectClone.SetActive(isActive);
             objectClone.CopyFrom(this);
+            objectClone.SetName(name);
             foreach (var behaviour in behaviours) {
                 var fields = behaviour.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                     .Where(field => Attribute.IsDefined(field, typeof(SerializedField)))

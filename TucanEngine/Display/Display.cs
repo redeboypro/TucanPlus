@@ -81,7 +81,7 @@ namespace TucanEngine.Display
 
             meshShader.Start();
             scene.OnRenderFrame(e);
-            
+
             guiManager.GetShaderProgram().Start();
             guiManager.OnRenderFrame(e);
             SwapBuffers();

@@ -47,7 +47,7 @@ namespace TucanEngine.Main.GameLogic
             var viewMatrix = GetViewMatrix();
             var worldSpaceLocation = vector.Transform(viewMatrix);
             var transformedLocation = Vector3.TransformPerspective(worldSpaceLocation, projection);
-            return new Vector3((0.5f + (0.5f * transformedLocation.X)) * display.Width,
+            return new Vector3((0.5f + 0.5f * transformedLocation.X) * display.Width,
                 (0.5f + (0.5f * -transformedLocation.Y)) * display.Height, transformedLocation.Z);
         }
 

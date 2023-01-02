@@ -52,8 +52,11 @@
     <Compile Include="Main\GameLogic\GameObject.cs" />
     <Compile Include="Main\GameLogic\Transform.cs" />
     <Compile Include="Main\Input.cs" />
+    <Compile Include="Physics\Components\BoxComponent.cs" />
+    <Compile Include="Physics\Components\TerrainComponent.cs" />
     <Compile Include="Physics\Physics.cs" />
     <Compile Include="Physics\Shapes\Box.cs" />
+    <Compile Include="Physics\Shapes\Terrain.cs" />
     <Compile Include="Physics\Shapes\Triangle.cs" />
     <Compile Include="Pooling\ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
