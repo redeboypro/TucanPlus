@@ -50,7 +50,8 @@ namespace TucanEngine.Main.GameLogic
                 .Where(behaviour => behaviour.GetType().IsAssignableFrom(typeof(T)))) {
                 return (T) behaviour;
             }
-            throw new Exception("Behavior cannot be found!");
+
+            return null;
         }
         
         [Obsolete("Method is deprecated, please use GetBehaviour<T>()")]

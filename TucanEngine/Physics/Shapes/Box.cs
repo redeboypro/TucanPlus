@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using OpenTK;
 using TucanEngine.Common.Math;
 using TucanEngine.Main.GameLogic;
+using TucanEngine.Rendering;
 
 namespace TucanEngine.Physics.Shapes
 {
@@ -52,6 +53,10 @@ namespace TucanEngine.Physics.Shapes
             this.min = sharedMin = min;
             this.max = sharedMax = max;
             ReturnToOriginalState();
+        }
+        
+        public void SetBoundsFromMesh(Mesh mesh) {
+            SetBounds(mesh.Min, mesh.Max);
         }
         
         public void ReturnToOriginalState() {

@@ -4,6 +4,7 @@ using OpenTK;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Main.GameLogic.Common;
 using TucanEngine.Physics.Shapes;
+using TucanEngine.Rendering.Components;
 
 namespace TucanEngine.Physics.Components
 {
@@ -29,8 +30,16 @@ namespace TucanEngine.Physics.Components
 
         public override void OnLoad(EventArgs e) {
             gameObject = GetAssignedObject();
-            var halfExtent = gameObject.WorldSpaceScale;
-            SetBounds(-halfExtent, halfExtent);
+            
+            var scale = gameObject.WorldSpaceScale;
+            var (min, max) = (-scale, scale);
+            
+            var meshRenderer = gameObject.GetBehaviour<MeshRenderer>();
+            if (meshRenderer != null) {
+                var mesh = meshRenderer.GetMesh();
+                (min, max) = (mesh.Min, mesh.Max);
+            }
+            SetBounds(min, max);
             Transform();
             Physics.Add(boxShape);
         }

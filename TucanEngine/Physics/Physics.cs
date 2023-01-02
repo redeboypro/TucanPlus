@@ -17,8 +17,16 @@ namespace TucanEngine.Physics
     {
         private static readonly List<IShape> Shapes = new List<IShape>();
 
+        public static bool Contains(IShape shape) {
+            return Shapes.Contains(shape);
+        }
+
         public static void Add(IShape shape) {
             Shapes.Add(shape);
+        }
+        
+        public static void Remove(IShape shape) {
+            Shapes.Remove(shape);
         }
         
         public static IShape GetShapeByIndex(int index) {

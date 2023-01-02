@@ -9,7 +9,11 @@ namespace TucanEngine.Rendering
         private GlArrayData arrayData;
         private int vertexCount;
 
-        public Mesh(Vector3[] vertices, Vector2[] textureCoordinates, int[] indices) {
+        public Vector3 Min { get; private set; }
+        public Vector3 Max { get; private set; }
+
+        public Mesh(Vector3[] vertices, Vector2[] textureCoordinates, int[] indices, (Vector3, Vector3) bounds) {
+            (Min, Max) = bounds;
             vertexCount = vertices.Length;
             arrayData = new GlArrayData();
             arrayData.Push(0, 3, vertices, BufferTarget.ArrayBuffer);

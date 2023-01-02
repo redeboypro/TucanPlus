@@ -25,7 +25,7 @@ namespace TucanPlus
 
                 var poolSource = new GameObject();
                 
-                var mesh = ModelLoader.LoadFromFile("ak47.obj");
+                var mesh = ModelLoader.LoadMeshFromFile("ak47.obj");
                 var texture = new Texture2D("ak47.png");
                 
                 var meshRenderer = new MeshRenderer();
@@ -43,8 +43,9 @@ namespace TucanPlus
                 
                 var instance2 = scene.InstantiateFromPool(TemporaryTag, Vector3.UnitZ * 5 + Vector3.UnitX, Quaternion.Identity, Vector3.One);
                 instance2.AddBehaviour<BoxComponent>();
-                instance2.GetBehaviour<BoxComponent>().IgnoreMtd = true;
-                
+                var boxComponent = instance2.GetBehaviour<BoxComponent>();
+                boxComponent.IgnoreMtd = true;
+
                 scene.GetCamera().AddBehaviour<FreeCameraController>();
                 scene.GetCamera().AddBehaviour<BoxComponent>();
 
