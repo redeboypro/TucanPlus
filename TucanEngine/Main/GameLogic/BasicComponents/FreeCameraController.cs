@@ -14,27 +14,14 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
 
         public override void OnLoad(EventArgs e) {
             cameraGameObject = GetAssignedObject();
-            Display.Display.GetCurrent().CursorGrabbed = true;
-            Display.Display.GetCurrent().CursorVisible = false;
+            Display.Display.GetCurrentDisplay().CursorGrabbed = true;
+            Display.Display.GetCurrentDisplay().CursorVisible = false;
         }
 
         public override void OnUpdateFrame(FrameEventArgs e) {
             if (Input.IsAnyKeyDown()) {
-                if (Input.IsKeyDown(Key.W)) {
-                    cameraGameObject.WorldSpaceLocation += cameraGameObject.Forward() * (float)e.Time * MovementSpeed;
-                }
-
-                if (Input.IsKeyDown(Key.S)) {
-                    cameraGameObject.WorldSpaceLocation -= cameraGameObject.Forward() * (float)e.Time * MovementSpeed;
-                }
-
-                if (Input.IsKeyDown(Key.A)) {
-                    cameraGameObject.WorldSpaceLocation += cameraGameObject.Right() * (float)e.Time * MovementSpeed;
-                }
-
-                if (Input.IsKeyDown(Key.D)) {
-                    cameraGameObject.WorldSpaceLocation -= cameraGameObject.Right() * (float)e.Time * MovementSpeed;
-                }
+                cameraGameObject.WorldSpaceLocation += cameraGameObject.Forward() * (float)e.Time * MovementSpeed * Input.GetAxis("Vertical");
+                cameraGameObject.WorldSpaceLocation += cameraGameObject.Right() * (float)e.Time * MovementSpeed * Input.GetAxis("Horizontal");
                 
                 if (Input.IsKeyDown(Key.Space)) {
                     cameraGameObject.WorldSpaceLocation += Vector3.UnitY * (float)e.Time * MovementSpeed;

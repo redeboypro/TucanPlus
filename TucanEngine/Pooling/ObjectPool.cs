@@ -8,7 +8,7 @@ namespace TucanEngine.Pooling
         private readonly string tag;
         private readonly T source;
         private readonly int capacity;
-        private bool isContained = false;
+        private bool isContained;
 
         public void MarkAsContained() {
             isContained = true;

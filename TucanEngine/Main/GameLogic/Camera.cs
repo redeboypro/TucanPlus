@@ -12,7 +12,7 @@ namespace TucanEngine.Main.GameLogic
         private Matrix4 projection;
 
         public Camera(float fieldOfView = MathHelper.PiOver4) { 
-            var display = Display.Display.GetCurrent(); 
+            var display = Display.Display.GetCurrentDisplay(); 
             projection = Matrix4.CreatePerspectiveFieldOfView(fieldOfView, display.Width / (float)display.Height, NearClip, FarClip);
         }
 
@@ -43,7 +43,7 @@ namespace TucanEngine.Main.GameLogic
         }
 
         public Vector3 WorldCoordinatesToRect(Vector3 vector) {
-            var display = Display.Display.GetCurrent();
+            var display = Display.Display.GetCurrentDisplay();
             var viewMatrix = GetViewMatrix();
             var worldSpaceLocation = vector.Transform(viewMatrix);
             var transformedLocation = Vector3.TransformPerspective(worldSpaceLocation, projection);

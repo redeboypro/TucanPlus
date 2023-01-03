@@ -11,12 +11,15 @@ using TucanEngine.Main.GameLogic.Common;
 namespace TucanEngine.Gui
 {
     public enum Orientation { Horizontal, Vertical }
+    public enum GuiEvent { Press, Release, Drag }
     public delegate void MouseMovingEvent(MouseMoveEventArgs e);
     public abstract class GuiElement : Transform, IBehaviour
     {
-        private readonly List<MouseMovingEvent> dragEvents = new List<MouseMovingEvent>();
-        private readonly List<Action> pressEvents = new List<Action>();
-        private readonly List<Action> releaseEvents = new List<Action>();
+        private readonly Dictionary<GuiEvent, List<object>> GuiEvents = new Dictionary<GuiEvent, List<object>> {
+            { GuiEvent.Press , new List<object>() },
+            { GuiEvent.Release, new List<object>() },
+            { GuiEvent.Drag, new List<object>() }
+        };
 
         private Color4 color = Color4.White;
         private Vector3 boundsMin;
@@ -43,17 +46,11 @@ namespace TucanEngine.Gui
             return isHighlighted;
         }
         
-        public override void OnMoving() { 
-            base.OnMoving();
-        }
+        public override void OnMoving() { }
         
-        public override void OnRotating() { 
-            base.OnRotating();
-        }
+        public override void OnRotating() { }
         
-        public override void OnScaling() { 
-            base.OnScaling();
-        }
+        public override void OnScaling() { }
 
         public override void OnTransformMatrices() {
             base.OnTransformMatrices();
@@ -62,22 +59,22 @@ namespace TucanEngine.Gui
         }
 
         public virtual void OnKeyDown(KeyboardKeyEventArgs e) {
-            InvokeInChildren(nameof(OnUpdateFrame));
+            InvokeInChildren(nameof(OnKeyDown), e);
         }
 
         public virtual void OnKeyUp(KeyboardKeyEventArgs e) {
-            InvokeInChildren(nameof(OnUpdateFrame));
+            InvokeInChildren(nameof(OnKeyUp), e);
         }
 
         public virtual void OnKeyPress(KeyPressEventArgs e) {
-            InvokeInChildren(nameof(OnUpdateFrame));
+            InvokeInChildren(nameof(OnKeyPress), e);
         }
         
         public virtual void OnMouseDown(MouseButtonEventArgs e) {
             if (!MouseIsInsideBounds(e)) return;
             OnPress();
             isPressed = true;
-            InvokeInChildren(nameof(OnMouseDown));
+            InvokeInChildren(nameof(OnMouseDown), e);
         }
         
         public virtual void OnMouseUp(MouseButtonEventArgs e) {
@@ -86,51 +83,59 @@ namespace TucanEngine.Gui
                 return;
             }
             OnRelease();
-            InvokeInChildren(nameof(OnMouseUp));
+            InvokeInChildren(nameof(OnMouseUp), e);
         }
         
         public virtual void OnMouseMove(MouseMoveEventArgs e) {
-            if (isPressed) OnDrag(e);
+            if (isPressed) {
+                OnDrag();
+            }
+            
             if (MouseIsInsideBounds(e)) {
-                if (isHighlighted) return;
+                if (isHighlighted) {
+                    return;
+                }
                 OnFocus();
                 isHighlighted = true;
             }
             else {
-                if (!isHighlighted) return;
+                if (!isHighlighted) {
+                    return;
+                }
                 isHighlighted = false;
                 OnOutOfFocus();
             }
-            InvokeInChildren(nameof(OnMouseMove));
+            
+            InvokeInChildren(nameof(OnMouseMove), e);
         }
 
         public virtual void OnPress() {
-            foreach (var action in pressEvents) {
-                action.Invoke();
+            foreach (var action in GuiEvents[GuiEvent.Press]) {
+                ((Action)action)?.Invoke();
             }
             InvokeInChildren(nameof(OnPress));
         }
         
         public virtual void OnRelease() {
-            foreach (var action in releaseEvents) {
-                action.Invoke();
+            foreach (var action in GuiEvents[GuiEvent.Release]) {
+                ((Action)action)?.Invoke();
             }
             InvokeInChildren(nameof(OnRelease));
         }
         
-        public virtual void OnDrag(MouseMoveEventArgs e) {
-            foreach (var action in dragEvents) {
-                action.Invoke(e);
+        public virtual void OnDrag() {
+            foreach (var action in GuiEvents[GuiEvent.Drag]) {
+                ((Action)action)?.Invoke();
             }
             InvokeInChildren(nameof(OnDrag));
         }
 
         public virtual void OnLoad(EventArgs e) {
-            InvokeInChildren(nameof(OnLoad));
+            InvokeInChildren(nameof(OnLoad), e);
         }
 
         public virtual void OnUpdateFrame(FrameEventArgs e) {
-            InvokeInChildren(nameof(OnUpdateFrame));
+            InvokeInChildren(nameof(OnUpdateFrame), e);
         }
 
         public virtual void OnRenderFrame(FrameEventArgs e)
@@ -143,43 +148,27 @@ namespace TucanEngine.Gui
                 GL.Enable(EnableCap.ScissorTest);
             }
 
-            InvokeInChildren(nameof(OnRenderFrame));
+            InvokeInChildren(nameof(OnRenderFrame), e);
             if (IsMasked) GL.Disable(EnableCap.ScissorTest);
         }
         
-        public void AddPressEvent(Action e) {
-            pressEvents.Add(e);
+        public void AddExpandingEvent(Action action, GuiEvent guiEventType) {
+            GuiEvents[guiEventType].Add(action);
         }
         
-        public void AddReleaseEvent(Action e) {
-            releaseEvents.Add(e);
-        }
-        
-        public void AddDragEvent(MouseMovingEvent e) {
-            dragEvents.Add(e);
-        }
-        
-        public void RemovePressEvent(Action e) {
-            pressEvents.Remove(e);
-        }
-        
-        public void RemoveReleaseEvent(Action e) {
-            releaseEvents.Remove(e);
-        }
-        
-        public void RemoveDragEvent(MouseMovingEvent e) {
-            dragEvents.Remove(e);
+        public void RemoveExpandingEvent(Action action, GuiEvent guiEventType) {
+            GuiEvents[guiEventType].Add(action);
         }
         
         public virtual void OnFocus() { }
 
         public virtual void OnOutOfFocus() { }
 
-        public void InvokeInChildren(string methodName) {
+        public void InvokeInChildren(string methodName, object eventArgs = null) {
             for (var index = 0; index < GetChildCount(); index++) {
                 var child = (GuiElement)GetChild(index);
-                child.GetType().GetMethod(methodName)?.Invoke(child, null);
-                child.InvokeInChildren(methodName);
+                child.GetType().GetMethod(methodName)?.Invoke(child, eventArgs != null ? new [] { eventArgs } : null);
+                child.InvokeInChildren(methodName, eventArgs);
             }
         }
         

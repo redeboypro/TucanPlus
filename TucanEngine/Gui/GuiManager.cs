@@ -50,7 +50,7 @@ namespace TucanEngine.Gui
         public Image2D Button(GuiElement content, Action e) {
             var guiElement = Image(skin.GetThumbTexture(), true);
             content.SetParent(guiElement);
-            guiElement.AddPressEvent(e);
+            guiElement.AddExpandingEvent(e, GuiEvent.Press);
             return guiElement;
         }
         

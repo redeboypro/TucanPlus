@@ -21,7 +21,12 @@ namespace TucanPlus
         public static void Main(string[] args) {
             var display = new Display(800, 600, "Tucan Display", () => {
                 var scene = new Scene();
-                var guiManager = GuiManager.GetCurrentManagerInstance();
+                
+                var guiSkin = new GuiSkin();
+                guiSkin.SetFont(new Texture2D("resources\\font.png"));
+                guiSkin.SetBoxTexture(new Texture2D("resources\\box.png"));
+                guiSkin.SetThumbTexture(new Texture2D("resources\\thumb.png"));
+                var guiManager = new GuiManager(guiSkin, new GuiShader());
 
                 var poolSource = new GameObject();
                 

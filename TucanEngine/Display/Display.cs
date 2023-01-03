@@ -16,9 +16,8 @@ namespace TucanEngine.Display
         private static Display currentDisplayInstance;
         private readonly Action loadEvent;
         
-        private GuiManager guiManager;
-        private GuiSkin guiSkin;
-        private Scene.Scene scene;
+        private GuiManager currentGuiManager;
+        private Scene.Scene currentScene;
 
         private MeshShader meshShader;
 
@@ -30,7 +29,7 @@ namespace TucanEngine.Display
             Run();
         }
 
-        public static Display GetCurrent() {
+        public static Display GetCurrentDisplay() {
             return currentDisplayInstance;
         }
         
@@ -48,17 +47,13 @@ namespace TucanEngine.Display
             #endregion
             
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
-            guiSkin = new GuiSkin();
-            guiSkin.SetFont(new Texture2D("resources\\font.png"));
-            guiSkin.SetBoxTexture(new Texture2D("resources\\box.png"));
-            guiSkin.SetThumbTexture(new Texture2D("resources\\thumb.png"));
-            guiManager = new GuiManager(guiSkin, new GuiShader());
+            
             meshShader = new MeshShader();
             loadEvent?.Invoke();
-            scene = Scene.Scene.GetCurrentScene();
-            scene.OnLoad(e);
-            guiManager.OnLoad(e);
+            currentScene = Scene.Scene.GetCurrentScene();
+            currentScene.OnLoad(e);
+            currentGuiManager = GuiManager.GetCurrentManagerInstance();
+            currentGuiManager.OnLoad(e);
             Input.OnLoad();
         }
 
@@ -70,8 +65,8 @@ namespace TucanEngine.Display
         protected override void OnUpdateFrame(FrameEventArgs e) {
             base.OnUpdateFrame(e);
             Input.OnUpdateFrame();
-            scene.OnUpdateFrame(e);
-            guiManager.OnUpdateFrame(e);
+            currentScene.OnUpdateFrame(e);
+            currentGuiManager.OnUpdateFrame(e);
         }
         
         protected override void OnRenderFrame(FrameEventArgs e) {
@@ -80,10 +75,9 @@ namespace TucanEngine.Display
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             meshShader.Start();
-            scene.OnRenderFrame(e);
-
-            guiManager.GetShaderProgram().Start();
-            guiManager.OnRenderFrame(e);
+            currentScene.OnRenderFrame(e);
+            currentGuiManager.GetShaderProgram().Start();
+            currentGuiManager.OnRenderFrame(e);
             SwapBuffers();
         }
         #endregion
@@ -91,46 +85,39 @@ namespace TucanEngine.Display
         #region [ Input events implementation ]
         protected override void OnKeyPress(KeyPressEventArgs e) {
             base.OnKeyPress(e);
-            scene.OnKeyPress(e);
-            guiManager.OnKeyPress(e);
+            currentScene.OnKeyPress(e);
+            currentGuiManager.OnKeyPress(e);
         }
 
         protected override void OnKeyUp(KeyboardKeyEventArgs e) {
             base.OnKeyUp(e);
-            scene.OnKeyUp(e);
-            guiManager.OnKeyUp(e);
+            currentScene.OnKeyUp(e);
+            currentGuiManager.OnKeyUp(e);
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e) {
             base.OnKeyDown(e);
-            scene.OnKeyDown(e);
-            guiManager.OnKeyDown(e);
+            currentScene.OnKeyDown(e);
+            currentGuiManager.OnKeyDown(e);
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e) {
             base.OnMouseDown(e);
-            scene.OnMouseDown(e);
-            guiManager.OnMouseDown(e);
+            currentScene.OnMouseDown(e);
+            currentGuiManager.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e) {
             base.OnMouseUp(e);
-            scene.OnMouseUp(e);
-            guiManager.OnMouseUp(e);
+            currentScene.OnMouseUp(e);
+            currentGuiManager.OnMouseUp(e);
         }
 
         protected override void OnMouseMove(MouseMoveEventArgs e) {
             base.OnMouseMove(e);
-            scene.OnMouseMove(e);
-            guiManager.OnMouseMove(e);
+            currentScene.OnMouseMove(e);
+            currentGuiManager.OnMouseMove(e);
         }
         #endregion
-
-        public Scene.Scene GetScene() {
-            return scene;
-        }
-        public GuiManager GetGuiManager() {
-            return guiManager;
-        }
     }
 }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using OpenTK;
 using OpenTK.Input;
 using TucanEngine.Common.Math;
+using TucanEngine.Main;
 using TucanEngine.Rendering;
 
 namespace TucanEngine.Gui
@@ -11,7 +12,7 @@ namespace TucanEngine.Gui
     {
         private const float ThumbScaleFactor = 0.1f;
         private const float BaseScaleFactor = 2.0f;
-        private const float ThresholdFactor = 0.25f;
+        private const float ThresholdFactor = 0.01f;
         
         private readonly float minValue;
         private readonly float maxValue;
@@ -33,12 +34,13 @@ namespace TucanEngine.Gui
             var guiManager = GuiManager.GetCurrentManagerInstance();
             thumb = guiManager.Image(guiManager.GetSkin().GetThumbTexture(), true);
             thumb.SetParent(this);
-            thumb.AddDragEvent(args => {
-                AddValue(orientation == Orientation.Horizontal ? args.XDelta * ThresholdFactor :
-                    orientation == Orientation.Vertical ? args.YDelta * -additionValueSign * ThresholdFactor :
-                    throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null));
+            thumb.AddExpandingEvent(() => {
+                AddValue(
+                    orientation == Orientation.Horizontal ? Input.GetMouseDeltaX() * ThresholdFactor :
+                    orientation == Orientation.Vertical ? Input.GetMouseDeltaY() * ThresholdFactor * -additionValueSign :
+                    throw new Exception("Unknown orientation"));
                 valueChangingEvent?.Invoke();
-            });
+            }, GuiEvent.Drag);
             RecalculateBounds();
         }
 
