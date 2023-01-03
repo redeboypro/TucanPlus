@@ -22,7 +22,7 @@ namespace TucanEngine.Main
         private static float mouseDeltaY;
         
         public static int GetAxis(string axisName) {
-            return -Convert.ToInt32(IsKeyDown(inputAxes[axisName].Item1)) + Convert.ToInt32(IsKeyDown(inputAxes[axisName].Item2));
+            return Convert.ToInt32(IsKeyDown(inputAxes[axisName].Item2)) - Convert.ToInt32(IsKeyDown(inputAxes[axisName].Item1));
         }
 
         public static bool IsKeyDown(Key key) {
