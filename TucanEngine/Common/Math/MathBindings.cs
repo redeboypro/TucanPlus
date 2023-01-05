@@ -6,7 +6,7 @@ using Quaternion = OpenTK.Quaternion;
 
 namespace TucanEngine.Common.Math
 {
-    public enum Axis { X, Y, Z }
+    public enum Axis { X, Y, Z, W }
     public static class MathBindings
     {
         public static readonly Vector3 EpsilonVector = new Vector3(float.Epsilon);
@@ -27,6 +27,22 @@ namespace TucanEngine.Common.Math
         #endregion
         
         #region [ Quaternion bindings ]
+        public static Quaternion SetUnit(this Quaternion quaternion, float value, Axis axis) {
+            switch (axis) {
+                case Axis.X: quaternion.X = value;
+                    break;
+                case Axis.Y: quaternion.Y = value; 
+                    break;
+                case Axis.Z: quaternion.Z = value;
+                    break;
+                case Axis.W: quaternion.W = value;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+            }
+            return quaternion;
+        }
+        
         public static Vector3 ToEulerAngles(this Quaternion quaternion) {
             const float edge = 0.4995f;
             var sqrtW = quaternion.W * quaternion.W;

@@ -5,7 +5,7 @@ using TucanEngine.Gui;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Main.GameLogic.Common;
 using TucanEngine.Rendering.Tools.Common;
-using TucanEngine.Serialization;
+using TucanEngine.Common.Serialization;
 
 namespace TucanEngine.Rendering.Components
 {

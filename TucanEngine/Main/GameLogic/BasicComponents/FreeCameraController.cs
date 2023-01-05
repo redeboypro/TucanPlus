@@ -8,7 +8,7 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
     public class FreeCameraController : Behaviour
     {
         private const float MovementSpeed = 5.0f;
-        private const float Sensitivity = 10.0f;
+        private const float Sensitivity = 50.0f;
 
         private GameObject cameraGameObject;
 

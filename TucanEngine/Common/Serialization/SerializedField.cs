@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TucanEngine.Serialization
+namespace TucanEngine.Common.Serialization
 {
     public class SerializedField : Attribute { }
 }

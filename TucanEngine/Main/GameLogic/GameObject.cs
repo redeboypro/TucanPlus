@@ -5,7 +5,7 @@ using System.Reflection;
 using OpenTK;
 using OpenTK.Input;
 using TucanEngine.Main.GameLogic.Common;
-using TucanEngine.Serialization;
+using TucanEngine.Common.Serialization;
 
 namespace TucanEngine.Main.GameLogic
 {
@@ -50,8 +50,15 @@ namespace TucanEngine.Main.GameLogic
                 .Where(behaviour => behaviour.GetType().IsAssignableFrom(typeof(T)))) {
                 return (T) behaviour;
             }
-
             return null;
+        }
+        
+        public Behaviour GetBehaviourWithInterface<T>() {
+            foreach (var behaviour in behaviours
+                .Where(behaviour => behaviour.GetType().GetInterface(typeof(T).Name) != null)) {
+                return behaviour;
+            }
+            throw new Exception("Behavior cannot be found!");
         }
         
         [Obsolete("Method is deprecated, please use GetBehaviour<T>()")]

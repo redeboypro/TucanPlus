@@ -26,6 +26,7 @@ namespace TucanEngine.Display
             Title = title;
             currentDisplayInstance = this;
             this.loadEvent = loadEvent;
+            VSync = VSyncMode.Off;
             Run();
         }
 
@@ -51,9 +52,9 @@ namespace TucanEngine.Display
             meshShader = new MeshShader();
             loadEvent?.Invoke();
             currentScene = Scene.Scene.GetCurrentScene();
-            currentScene.OnLoad(e);
+            currentScene?.OnLoad(e);
             currentGuiManager = GuiManager.GetCurrentManagerInstance();
-            currentGuiManager.OnLoad(e);
+            currentGuiManager?.OnLoad(e);
             Input.OnLoad();
         }
 
@@ -65,8 +66,8 @@ namespace TucanEngine.Display
         protected override void OnUpdateFrame(FrameEventArgs e) {
             base.OnUpdateFrame(e);
             Input.OnUpdateFrame();
-            currentScene.OnUpdateFrame(e);
-            currentGuiManager.OnUpdateFrame(e);
+            currentScene?.OnUpdateFrame(e);
+            currentGuiManager?.OnUpdateFrame(e);
         }
         
         protected override void OnRenderFrame(FrameEventArgs e) {
@@ -75,9 +76,9 @@ namespace TucanEngine.Display
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             meshShader.Start();
-            currentScene.OnRenderFrame(e);
-            currentGuiManager.GetShaderProgram().Start();
-            currentGuiManager.OnRenderFrame(e);
+            currentScene?.OnRenderFrame(e);
+            currentGuiManager?.GetShaderProgram().Start();
+            currentGuiManager?.OnRenderFrame(e);
             SwapBuffers();
         }
         #endregion
@@ -85,38 +86,38 @@ namespace TucanEngine.Display
         #region [ Input events implementation ]
         protected override void OnKeyPress(KeyPressEventArgs e) {
             base.OnKeyPress(e);
-            currentScene.OnKeyPress(e);
-            currentGuiManager.OnKeyPress(e);
+            currentScene?.OnKeyPress(e);
+            currentGuiManager?.OnKeyPress(e);
         }
 
         protected override void OnKeyUp(KeyboardKeyEventArgs e) {
             base.OnKeyUp(e);
-            currentScene.OnKeyUp(e);
-            currentGuiManager.OnKeyUp(e);
+            currentScene?.OnKeyUp(e);
+            currentGuiManager?.OnKeyUp(e);
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e) {
             base.OnKeyDown(e);
-            currentScene.OnKeyDown(e);
-            currentGuiManager.OnKeyDown(e);
+            currentScene?.OnKeyDown(e);
+            currentGuiManager?.OnKeyDown(e);
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e) {
             base.OnMouseDown(e);
-            currentScene.OnMouseDown(e);
-            currentGuiManager.OnMouseDown(e);
+            currentScene?.OnMouseDown(e);
+            currentGuiManager?.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e) {
             base.OnMouseUp(e);
-            currentScene.OnMouseUp(e);
-            currentGuiManager.OnMouseUp(e);
+            currentScene?.OnMouseUp(e);
+            currentGuiManager?.OnMouseUp(e);
         }
 
         protected override void OnMouseMove(MouseMoveEventArgs e) {
             base.OnMouseMove(e);
-            currentScene.OnMouseMove(e);
-            currentGuiManager.OnMouseMove(e);
+            currentScene?.OnMouseMove(e);
+            currentGuiManager?.OnMouseMove(e);
         }
         #endregion
     }

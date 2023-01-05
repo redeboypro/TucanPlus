@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections;
 using OpenTK;
 using TucanEngine.AssimpImplementation;
+using TucanEngine.Common.Math;
 using TucanEngine.Display;
 using TucanEngine.Gui;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Main.GameLogic.BasicComponents;
+using TucanEngine.Networking.Components;
 using TucanEngine.Physics.Components;
 using TucanEngine.Physics.Shapes;
 using TucanEngine.Pooling;
@@ -19,14 +22,10 @@ namespace TucanPlus
         private const string TemporaryTag = "Temp";
         
         public static void Main(string[] args) {
+            var command = Console.ReadLine();
             var display = new Display(800, 600, "Tucan Display", () => {
                 var scene = new Scene();
-                
-                var guiSkin = new GuiSkin();
-                guiSkin.SetFont(new Texture2D("resources\\font.png"));
-                guiSkin.SetBoxTexture(new Texture2D("resources\\box.png"));
-                guiSkin.SetThumbTexture(new Texture2D("resources\\thumb.png"));
-                var guiManager = new GuiManager(guiSkin, new GuiShader());
+                var camera = scene.GetCamera();
 
                 var poolSource = new GameObject();
                 
@@ -48,11 +47,42 @@ namespace TucanPlus
                 
                 var instance2 = scene.InstantiateFromPool(TemporaryTag, Vector3.UnitZ * 5 + Vector3.UnitX, Quaternion.Identity, Vector3.One);
                 instance2.AddBehaviour<BoxComponent>();
+                
                 var boxComponent = instance2.GetBehaviour<BoxComponent>();
                 boxComponent.IgnoreMtd = true;
+                
+                camera.AddBehaviour<BoxComponent>();
+                
+                var addressComponents = command.Split(' ')[1].Split(':');
+                
+                if (command.Contains("host")) {
+                    camera.AddBehaviour<Server>();
+                    
+                    var server = camera.GetBehaviour<Server>();
+                    server.Start(addressComponents[0], int.Parse(addressComponents[1]));
+                    instance2.AddBehaviour<NetTransformReceiver>();
 
-                scene.GetCamera().AddBehaviour<FreeCameraController>();
-                scene.GetCamera().AddBehaviour<BoxComponent>();
+                    instance2.WorldSpaceLocation = Vector3.Zero;
+                    camera.WorldSpaceLocation = Vector3.UnitZ * 5 + Vector3.UnitX;
+                    
+                    server.ReceiveData = data => {
+                        instance2.GetBehaviour<NetTransformReceiver>().UpdateTarget(data);
+                    };
+                }
+                else if (command.Contains("connect")) {
+                    camera.AddBehaviour<FreeCameraController>();
+                    camera.AddBehaviour<Client>();
+                    
+                    var client = camera.GetBehaviour<Client>();
+                    client.Connect(addressComponents[0], int.Parse(addressComponents[1]));
+                    instance2.AddBehaviour<NetTransformReceiver>();
+                    
+                    client.ReceiveData = data => {
+                        instance2.GetBehaviour<NetTransformReceiver>().UpdateTarget(data);
+                    };
+                }
+                
+                camera.AddBehaviour<NetTransformSender>();
 
                 instance.LocalSpaceRotation = Quaternion.FromEulerAngles(
                     MathHelper.DegreesToRadians(90),

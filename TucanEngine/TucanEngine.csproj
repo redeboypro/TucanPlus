@@ -37,6 +37,8 @@
     <Compile Include="Common\Drawables\PrimitiveData.cs" />
     <Compile Include="Common\Math\MathBindings.cs" />
     <Compile Include="Common\Math\Ortho.cs" />
+    <Compile Include="Common\Serialization\SerializedField.cs" />
+    <Compile Include="Common\Serialization\SerializeUtil.cs" />
     <Compile Include="Display\Display.cs" />
     <Compile Include="Gui\Font.cs" />
     <Compile Include="Gui\GuiElement.cs" />
@@ -52,6 +54,13 @@
     <Compile Include="Main\GameLogic\GameObject.cs" />
     <Compile Include="Main\GameLogic\Transform.cs" />
     <Compile Include="Main\Input.cs" />
+    <Compile Include="Networking\Common\NetworkConstants.cs" />
+    <Compile Include="Networking\Components\Client.cs" />
+    <Compile Include="Networking\Components\INetworkComponent.cs" />
+    <Compile Include="Networking\Components\NetTransformReceiver.cs" />
+    <Compile Include="Networking\Components\NetTransformSender.cs" />
+    <Compile Include="Networking\Components\Server.cs" />
+    <Compile Include="Networking\Package.cs" />
     <Compile Include="Physics\Components\BoxComponent.cs" />
     <Compile Include="Physics\Components\TerrainComponent.cs" />
     <Compile Include="Physics\Physics.cs" />
@@ -69,7 +78,6 @@
     <Compile Include="Rendering\Tools\Common\ShaderConstants.cs" />
     <Compile Include="Rendering\Tools\ShaderProgram.cs" />
     <Compile Include="Scene\Scene.cs" />
-    <Compile Include="Serialization\SerializedField.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="AssimpNet, Version=4.1.0.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6">
@@ -86,9 +94,6 @@
   <ItemGroup>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Networking" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AssimpNet.4.1.0\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.4.1.0\build\AssimpNet.targets')" />
