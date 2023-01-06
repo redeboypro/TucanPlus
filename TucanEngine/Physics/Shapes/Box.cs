@@ -20,6 +20,9 @@ namespace TucanEngine.Physics.Shapes
         private Vector3 sharedMin;
         private Vector3 sharedMax;
 
+        public bool IgnoreRotation { get; set; }
+        public Transform AssignedTransform { get; set; }
+
         public Box(Vector3 min, Vector3 max) {
             SetBounds(min, max);
         }
@@ -71,12 +74,19 @@ namespace TucanEngine.Physics.Shapes
         }
         
         public void Transform(Transform transform) {
-            ReturnToOriginalState();
-
             center = transform.WorldSpaceLocation;
+
+            if (IgnoreRotation) {
+                sharedMin = min + center;
+                sharedMax = max + center;
+                return;
+            }
+            
+            ReturnToOriginalState();
+            
             sharedMin = Vector3.One * float.PositiveInfinity;
             sharedMax = Vector3.One * float.NegativeInfinity;
-            
+
             for(var i = 0; i < VertexCount; i++) {
                 sharedVertices[i] = transform.WorldSpaceRotation * (vertices[i] * transform.WorldSpaceScale) + transform.WorldSpaceLocation;
             }

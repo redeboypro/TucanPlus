@@ -12,6 +12,8 @@ namespace TucanEngine.Physics.Shapes
         private readonly Vector3[] vertices;
         private readonly Vector3[] sharedVertices;
         private Vector3 normal;
+        
+        public Transform AssignedTransform { get; set; }
 
         public Triangle(Vector3[] vertices, Vector3 normal) {
             this.normal = normal;

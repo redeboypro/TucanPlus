@@ -8,16 +8,23 @@ using TucanEngine.Rendering.Components;
 
 namespace TucanEngine.Physics.Components
 {
-    public class BoxComponent : Behaviour
+    public delegate void MtdCorrectionEvent(Transform transform, Face direction);
+    
+    public class BoxComponent : Behaviour, IPhysicsComponent
     {
         private Box boxShape;
         private GameObject gameObject;
-        
-        [Obsolete("Physics: Ignoring the pair collision (crutch implementation)")]
+        private bool isGrounded;
+        private float fallingVelocity;
+
+        public bool RecalculateBoundsEveryFrame { get; set; } = true;
+        public bool IgnoreGravity { get; set; } = true;
         public bool IgnoreMtd { get; set; }
-        
-        [Obsolete("Physics: Flag is deprecated")]
-        public bool EnableAABBCollisionDebugging { get; set; }
+        public MtdCorrectionEvent MtdCorrection { get; set; }
+
+        public bool IsGrounded() {
+            return isGrounded;
+        }
 
         public Box GetBoxShape() {
             return boxShape;
@@ -28,18 +35,27 @@ namespace TucanEngine.Physics.Components
             Transform();
         }
 
+        public void TossUp(float force) {
+            if (!IgnoreGravity) {
+                fallingVelocity = force;
+            }
+        }
+
         public override void OnLoad(EventArgs e) {
             gameObject = GetAssignedObject();
             
             var scale = gameObject.WorldSpaceScale;
-            var (min, max) = (-scale, scale);
+            var (min, max) = (-scale * 0.5f, scale * 0.5f);
             
             var meshRenderer = gameObject.GetBehaviour<MeshRenderer>();
             if (meshRenderer != null) {
                 var mesh = meshRenderer.GetMesh();
                 (min, max) = (mesh.Min, mesh.Max);
             }
+
             SetBounds(min, max);
+            boxShape.AssignedTransform = gameObject;
+            
             Transform();
             Physics.Add(boxShape);
         }
@@ -49,43 +65,56 @@ namespace TucanEngine.Physics.Components
             if (boxShape == null || IgnoreMtd) {
                 return;
             }
-            Transform();
 
+            if (RecalculateBoundsEveryFrame) {
+                Transform();
+            }
+
+            isGrounded = false;
+            
             for (var i = 0; i < Physics.GetShapeCount(); i++) {
                 var collisionShape = Physics.GetShapeByIndex(i);
                 if(collisionShape == boxShape) continue;
                 
-                switch (collisionShape.GetType().Name) {
-                    case nameof(Box) :
-                        if (Physics.BoxBoxIntersection(boxShape, (Box) collisionShape, out var boxBoxMinTranslation)) {
+                switch (collisionShape) {
+                    case Box collisionBox:
+                        if (Physics.BoxBoxIntersection(boxShape, collisionBox, out var boxBoxMinTranslation, out var translationDirection)) {
+                            
                             gameObject.WorldSpaceLocation += boxBoxMinTranslation;
-                            var collisionBox = (Box)collisionShape;
-                            if(EnableAABBCollisionDebugging) { 
-                                Console.Write($@"
-Collision:
-  A:
-    Min:{boxShape.GetMin()}
-    Max:{boxShape.GetMax()}
-
-  B:
-    Min:{collisionBox.GetMin()}
-    Max:{collisionBox.GetMax()}
-");
+                            
+                            if (translationDirection is Face.Up) {
+                                fallingVelocity = 0.0f;
+                                isGrounded = true;
                             }
+                            
+                            MtdCorrection?.Invoke(collisionBox.AssignedTransform, translationDirection);
                         }
                         break;
-                    case nameof(Triangle) :
-                        if (Physics.BoxTriangleIntersection(boxShape, (Triangle) collisionShape, out var boxTriangleMinTranslation)) {
+                    case Triangle collisionTriangle :
+                        if (Physics.BoxTriangleIntersection(boxShape, collisionTriangle, out var boxTriangleMinTranslation)) {
                             gameObject.WorldSpaceLocation += boxTriangleMinTranslation;
+                            fallingVelocity = 0.0f;
+                            isGrounded = true;
+                            MtdCorrection?.Invoke(collisionTriangle.AssignedTransform, Face.Up);
                         }
                         break;
-                    case nameof(Terrain) :
-                        if (Physics.BoxTerrainIntersection(boxShape, (Terrain) collisionShape, out var boxTerrainMinTranslation)) {
+                    case Terrain collisionTerrain :
+                        if (Physics.BoxTerrainIntersection(boxShape, collisionTerrain, out var boxTerrainMinTranslation)) {
                             gameObject.WorldSpaceLocation += boxTerrainMinTranslation;
+                            fallingVelocity = 0.0f;
+                            isGrounded = true;
+                            MtdCorrection?.Invoke(collisionTerrain.AssignedTransform, Face.Up);
                         }
                         break;
                 }
             }
+
+            if (IgnoreGravity) {
+                return;
+            }
+
+            fallingVelocity += Physics.Gravity * (float)e.Time;
+            gameObject.Move(0, fallingVelocity * (float)e.Time, 0);
         }
 
         private void Transform() {

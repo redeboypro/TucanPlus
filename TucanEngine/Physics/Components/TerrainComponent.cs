@@ -6,7 +6,7 @@ using TucanEngine.Physics.Shapes;
 
 namespace TucanEngine.Physics.Components
 {
-    public class TerrainComponent : Behaviour
+    public class TerrainComponent : Behaviour, IPhysicsComponent
     {
         private Terrain terrainShape;
 
@@ -15,6 +15,7 @@ namespace TucanEngine.Physics.Components
                 Physics.Remove(terrainShape);
             }
             terrainShape = terrain;
+            terrainShape.AssignedTransform = GetAssignedObject();
             Physics.Add(terrainShape);
         }
         

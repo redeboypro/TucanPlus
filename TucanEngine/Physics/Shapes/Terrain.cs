@@ -7,6 +7,8 @@ namespace TucanEngine.Physics.Shapes
     public class Terrain : IShape
     {
         private readonly Triangle[] triangles;
+        
+        public Transform AssignedTransform { get; set; }
 
         public Terrain(Triangle[] triangles) {
             this.triangles = triangles;

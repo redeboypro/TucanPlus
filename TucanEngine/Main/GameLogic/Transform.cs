@@ -214,6 +214,14 @@ namespace TucanEngine.Main.GameLogic
         public void Rotate(float angle, Vector3 axis) {
             Rotate(Quaternion.FromAxisAngle(axis, angle));
         }
+        
+        public void Move(float deltaX, float deltaY, float deltaZ) {
+            Move(new Vector3(deltaX, deltaY, deltaZ));
+        }
+        
+        public void Move(Vector3 delta) {
+            LocalSpaceLocation += delta;
+        }
 
         public virtual void OnMoving() { }
         public virtual void OnRotating() { }

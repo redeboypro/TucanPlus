@@ -6,6 +6,7 @@ using OpenTK;
 using OpenTK.Input;
 using TucanEngine.Main.GameLogic.Common;
 using TucanEngine.Common.Serialization;
+using TucanEngine.Physics.Components;
 
 namespace TucanEngine.Main.GameLogic
 {
@@ -16,6 +17,8 @@ namespace TucanEngine.Main.GameLogic
         private bool isActive;
         private int index;
         private string name;
+
+        public IPhysicsComponent PhysicsComponent { get; private set; }
 
         public GameObject(int layer = 0) {
             this.layer = layer;
@@ -128,11 +131,16 @@ namespace TucanEngine.Main.GameLogic
         public void OnLoad(EventArgs e) {
             foreach (var behaviour in behaviours.Where(behaviour => behaviour.IsActive())) {
                 behaviour.OnLoad(e);
+                
+                if (behaviour is IPhysicsComponent physicsComponent) {
+                    PhysicsComponent = physicsComponent;
+                }
             }
         }
 
         public void OnUpdateFrame(FrameEventArgs e) {
-            foreach (var behaviour in behaviours.Where(behaviour => behaviour.IsActive())) {
+            ((Behaviour)PhysicsComponent).OnUpdateFrame(e);
+            foreach (var behaviour in behaviours.Where(behaviour => behaviour.IsActive() && behaviour != (Behaviour)PhysicsComponent)) {
                 behaviour.OnUpdateFrame(e);
             }
         }

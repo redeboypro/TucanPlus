@@ -3,12 +3,36 @@ using System.Collections.Generic;
 using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using TucanEngine.Common.Math;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Physics.Shapes;
 
 namespace TucanEngine.Physics
 {
-    public interface IShape {
+    public static class DirectionNumber
+    {
+        public const int X = 1;
+        public const int Y = 2;
+        public const int Z = 3;
+    }
+    
+    public enum Face
+    {
+        Front = -DirectionNumber.Z,
+        Back = DirectionNumber.Z,
+        
+        Right = -DirectionNumber.X,
+        Left = DirectionNumber.X,
+
+        Up = -DirectionNumber.Y,
+        Down = DirectionNumber.Y,
+        
+        None
+    }
+    
+    public interface IShape 
+    {
+        Transform AssignedTransform { get; set; }
         void Transform(Transform transform);
         bool Raycast(Vector3 start, Vector3 direction, out Vector3 hitPoint);
     }
@@ -16,6 +40,8 @@ namespace TucanEngine.Physics
     public static class Physics
     {
         private static readonly List<IShape> Shapes = new List<IShape>();
+
+        public static float Gravity { get; set; } = -60.0f;
 
         public static bool Contains(IShape shape) {
             return Shapes.Contains(shape);
@@ -37,11 +63,13 @@ namespace TucanEngine.Physics
             return Shapes.Count;
         }
 
-        public static bool BoxBoxIntersection(Box boxA, Box boxB, out Vector3 minTranslation) {
+        public static bool BoxBoxIntersection(Box boxA, Box boxB, out Vector3 minTranslation, out Face translationDirection) {
             var aCenter = boxA.GetCenter();
             var bCenter = boxB.GetCenter();
             var distance = bCenter - aCenter;
+            
             minTranslation = Vector3.Zero;
+            translationDirection = Face.None;
             
             distance.X = Math.Abs(distance.X);
             distance.Y = Math.Abs(distance.Y);
@@ -53,15 +81,21 @@ namespace TucanEngine.Physics
                 var correctionDistance = boxB.GetCenter() - boxA.GetCenter();
                 
                 if (distance.X > distance.Y && distance.X > distance.Z) {
-                    minTranslation.X = distance.X * Math.Sign(correctionDistance.X);
+                    var sign = Math.Sign(correctionDistance.X);
+                    minTranslation.X = distance.X * sign;
+                    translationDirection = (Face) (sign * DirectionNumber.X);
                 }
 
                 if(distance.Y > distance.X && distance.Y > distance.Z) {
-                    minTranslation.Y = distance.Y * Math.Sign(correctionDistance.Y);
+                    var sign = Math.Sign(correctionDistance.Y);
+                    minTranslation.Y = distance.Y * sign;
+                    translationDirection = (Face) (sign * DirectionNumber.Y);
                 }
                 
                 if (distance.Z > distance.Y && distance.Z > distance.X) {
-                    minTranslation.Z = distance.Z * Math.Sign(correctionDistance.Z);
+                    var sign = Math.Sign(correctionDistance.Z);
+                    minTranslation.Z = distance.Z * sign;
+                    translationDirection = (Face) (sign * DirectionNumber.Z);
                 }
                 return true;
             }
@@ -94,6 +128,7 @@ namespace TucanEngine.Physics
                         var rayDirection = (aPoint - bPoint).Normalized() * planeNormalSignMultiplier;
                         
                         var lineIsIntersectsTriangle = RaycastPlane(rayStart, rayDirection, triangle[0], triangle.GetNormal(), out var hitPoint);
+                        hitPoint = aPoint.SetUnit(trianglePointProjectionHeight, Axis.Y);
                         
                         if (lineIsIntersectsTriangle) {
                             boxIsIntersectsTriangle = true;

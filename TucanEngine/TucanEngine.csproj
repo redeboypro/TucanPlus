@@ -48,6 +48,7 @@
     <Compile Include="Gui\Image2D.cs" />
     <Compile Include="Gui\Slider.cs" />
     <Compile Include="Gui\Text2D.cs" />
+    <Compile Include="Main\GameLogic\BasicComponents\BasicFirstPersonController.cs" />
     <Compile Include="Main\GameLogic\BasicComponents\FreeCameraController.cs" />
     <Compile Include="Main\GameLogic\Camera.cs" />
     <Compile Include="Main\GameLogic\Common\Behaviour.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Networking\Components\Server.cs" />
     <Compile Include="Networking\Package.cs" />
     <Compile Include="Physics\Components\BoxComponent.cs" />
+    <Compile Include="Physics\Components\IPhysicsComponent.cs" />
     <Compile Include="Physics\Components\TerrainComponent.cs" />
     <Compile Include="Physics\Physics.cs" />
     <Compile Include="Physics\Shapes\Box.cs" />
