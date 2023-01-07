@@ -41,7 +41,7 @@ namespace TucanEngine.Physics
     {
         private static readonly List<IShape> Shapes = new List<IShape>();
 
-        public static float Gravity { get; set; } = -60.0f;
+        public static float Gravity { get; set; } = -40.0f;
 
         public static bool Contains(IShape shape) {
             return Shapes.Contains(shape);

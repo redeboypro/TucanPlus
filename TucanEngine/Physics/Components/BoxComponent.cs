@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using OpenTK;
+using TucanEngine.Common.Serialization;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Main.GameLogic.Common;
 using TucanEngine.Physics.Shapes;
@@ -17,9 +18,12 @@ namespace TucanEngine.Physics.Components
         private bool isGrounded;
         private float fallingVelocity;
 
-        public bool RecalculateBoundsEveryFrame { get; set; } = true;
-        public bool IgnoreGravity { get; set; } = true;
-        public bool IgnoreMtd { get; set; }
+        [SerializedField]
+        public bool IgnoreGravity = true;
+        
+        [SerializedField]
+        public bool IgnoreMtd;
+        
         public MtdCorrectionEvent MtdCorrection { get; set; }
 
         public bool IsGrounded() {
@@ -60,22 +64,23 @@ namespace TucanEngine.Physics.Components
             Physics.Add(boxShape);
         }
 
-        public override void OnUpdateFrame(FrameEventArgs e)
-        {
+        public override void OnUpdateFrame(FrameEventArgs e) {
             if (boxShape == null || IgnoreMtd) {
                 return;
             }
-
-            if (RecalculateBoundsEveryFrame) {
-                Transform();
-            }
+            Transform();
 
             isGrounded = false;
-            
+
+            if (!IgnoreGravity) {
+                fallingVelocity += Physics.Gravity * (float)e.Time;
+                gameObject.Move(0, fallingVelocity * (float)e.Time, 0);
+            }
+
             for (var i = 0; i < Physics.GetShapeCount(); i++) {
                 var collisionShape = Physics.GetShapeByIndex(i);
                 if(collisionShape == boxShape) continue;
-                
+
                 switch (collisionShape) {
                     case Box collisionBox:
                         if (Physics.BoxBoxIntersection(boxShape, collisionBox, out var boxBoxMinTranslation, out var translationDirection)) {
@@ -108,13 +113,6 @@ namespace TucanEngine.Physics.Components
                         break;
                 }
             }
-
-            if (IgnoreGravity) {
-                return;
-            }
-
-            fallingVelocity += Physics.Gravity * (float)e.Time;
-            gameObject.Move(0, fallingVelocity * (float)e.Time, 0);
         }
 
         private void Transform() {

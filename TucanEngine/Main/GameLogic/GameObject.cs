@@ -163,15 +163,17 @@ namespace TucanEngine.Main.GameLogic
             objectClone.CopyFrom(this);
             objectClone.SetName(name);
             foreach (var behaviour in behaviours) {
-                var fields = behaviour.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+                const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+                
+                var fields = behaviour.GetType().GetFields(flags)
                     .Where(field => Attribute.IsDefined(field, typeof(SerializedField)))
                     .ToDictionary(field => field.Name, field => field.GetValue(behaviour));
                 
                 var behaviourClone = (Behaviour) Activator.CreateInstance(behaviour.GetType());
-                foreach (var field in behaviourClone.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)) {
-                    if (Attribute.IsDefined(field, typeof(SerializedField))) {
-                        field.SetValue(behaviourClone, fields[field.Name]);
-                    }
+                var behaviourType = behaviourClone.GetType();
+                
+                foreach (var field in fields) {
+                    behaviourType.GetField(field.Key, flags)?.SetValue(behaviourClone, field.Value);
                 }
                 objectClone.AddBehaviour(behaviourClone);
             }

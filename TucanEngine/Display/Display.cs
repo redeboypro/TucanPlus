@@ -14,16 +14,19 @@ namespace TucanEngine.Display
     public class Display : GameWindow
     {
         private static Display currentDisplayInstance;
+
+        private readonly string title;
         private readonly Action loadEvent;
-        
         private GuiManager currentGuiManager;
         private Scene.Scene currentScene;
-
         private MeshShader meshShader;
+        private float currentFrameTime = 0.0f;
+        
+        public int FramesPerSecond { get; set; }
 
         public Display(int width, int height, string title, Action loadEvent = null) {
             Width = width; Height = height; 
-            Title = title;
+            this.title = title;
             currentDisplayInstance = this;
             this.loadEvent = loadEvent;
             VSync = VSyncMode.Off;
@@ -65,6 +68,15 @@ namespace TucanEngine.Display
 
         protected override void OnUpdateFrame(FrameEventArgs e) {
             base.OnUpdateFrame(e);
+            
+            currentFrameTime += (float)e.Time;
+            FramesPerSecond++;
+            if (currentFrameTime >= 1.0f) {
+                Title = $"{title} FPS:{FramesPerSecond}";
+                currentFrameTime = 0.0f;
+                FramesPerSecond = 0;
+            }
+            
             Input.OnUpdateFrame();
             currentScene?.OnUpdateFrame(e);
             currentGuiManager?.OnUpdateFrame(e);

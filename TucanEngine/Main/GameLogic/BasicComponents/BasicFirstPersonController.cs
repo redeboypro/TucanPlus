@@ -33,7 +33,7 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
                 gameObject.WorldSpaceLocation += gameObject.Right() * (float)e.Time * MovementSpeed * Input.GetAxis("Horizontal");
                 
                 if (Input.IsKeyDown(Key.Space) && boxComponent.IsGrounded()) {
-                    boxComponent.TossUp(10);
+                    boxComponent.TossUp(5);
                 }
             }
 
