@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using OpenTK;
 using TucanEngine.Common.Serialization;
 using TucanEngine.Main.GameLogic;
@@ -13,6 +15,7 @@ namespace TucanEngine.Physics.Components
     
     public class BoxComponent : Behaviour, IPhysicsComponent
     {
+        private readonly List<IShape> contacts = new List<IShape>();
         private Box boxShape;
         private GameObject gameObject;
         private bool isGrounded;
@@ -25,6 +28,8 @@ namespace TucanEngine.Physics.Components
         public bool IgnoreMtd;
         
         public MtdCorrectionEvent MtdCorrection { get; set; }
+        public MtdCorrectionEvent CollisionEnter { get; set; }
+        public MtdCorrectionEvent CollisionExit { get; set; }
 
         public bool IsGrounded() {
             return isGrounded;
@@ -77,16 +82,24 @@ namespace TucanEngine.Physics.Components
                 gameObject.Move(0, fallingVelocity * (float)e.Time, 0);
             }
 
+            var currentContacts = new List<IShape>();
             for (var i = 0; i < Physics.GetShapeCount(); i++) {
                 var collisionShape = Physics.GetShapeByIndex(i);
-                if(collisionShape == boxShape) continue;
-
+                if (collisionShape == boxShape || !((GameObject)collisionShape.AssignedTransform).IsActive()) {
+                    continue;
+                }
+                
                 switch (collisionShape) {
                     case Box collisionBox:
                         if (Physics.BoxBoxIntersection(boxShape, collisionBox, out var boxBoxMinTranslation, out var translationDirection)) {
-                            
                             gameObject.WorldSpaceLocation += boxBoxMinTranslation;
                             
+                            currentContacts.Add(collisionBox);
+                            if (!contacts.Contains(collisionBox)) {
+                                CollisionEnter?.Invoke(collisionBox.AssignedTransform, translationDirection);
+                                contacts.Add(collisionBox);
+                            }
+
                             if (translationDirection is Face.Up) {
                                 fallingVelocity = 0.0f;
                                 isGrounded = true;
@@ -98,6 +111,13 @@ namespace TucanEngine.Physics.Components
                     case Triangle collisionTriangle :
                         if (Physics.BoxTriangleIntersection(boxShape, collisionTriangle, out var boxTriangleMinTranslation)) {
                             gameObject.WorldSpaceLocation += boxTriangleMinTranslation;
+                            
+                            currentContacts.Add(collisionTriangle);
+                            if (!contacts.Contains(collisionTriangle)) {
+                                CollisionEnter?.Invoke(collisionTriangle.AssignedTransform, Face.Up);
+                                contacts.Add(collisionTriangle);
+                            }
+                            
                             fallingVelocity = 0.0f;
                             isGrounded = true;
                             MtdCorrection?.Invoke(collisionTriangle.AssignedTransform, Face.Up);
@@ -106,11 +126,25 @@ namespace TucanEngine.Physics.Components
                     case Terrain collisionTerrain :
                         if (Physics.BoxTerrainIntersection(boxShape, collisionTerrain, out var boxTerrainMinTranslation)) {
                             gameObject.WorldSpaceLocation += boxTerrainMinTranslation;
+                            
+                            currentContacts.Add(collisionTerrain);
+                            if (!contacts.Contains(collisionTerrain)) {
+                                CollisionEnter?.Invoke(collisionTerrain.AssignedTransform, Face.Up);
+                                contacts.Add(collisionTerrain);
+                            }
+                            
                             fallingVelocity = 0.0f;
                             isGrounded = true;
                             MtdCorrection?.Invoke(collisionTerrain.AssignedTransform, Face.Up);
                         }
                         break;
+                }
+            }
+            
+            foreach (var contact in contacts.ToArray()) {
+                if (!currentContacts.Contains(contact)) {
+                    CollisionExit?.Invoke(contact.AssignedTransform, Face.None);
+                    contacts.Remove(contact);
                 }
             }
         }

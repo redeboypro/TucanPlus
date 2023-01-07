@@ -33,8 +33,20 @@ namespace TucanEngine.Main
             return keyboardState.IsKeyUp(key);
         }
         
+        public static bool IsMouseButtonDown(MouseButton button) {
+            return mouseState.IsButtonDown(button);
+        }
+        
+        public static bool IsMouseButtonUp(MouseButton button) {
+            return mouseState.IsButtonUp(button);
+        }
+        
         public static bool IsAnyKeyDown() {
             return keyboardState.IsAnyKeyDown;
+        }
+        
+        public static bool IsAnyMouseButtonDown() {
+            return mouseState.IsAnyButtonDown;
         }
 
         public static float GetMouseDeltaX() {

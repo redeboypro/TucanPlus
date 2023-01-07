@@ -17,6 +17,7 @@ namespace TucanEngine.Main.GameLogic
         private bool isActive;
         private int index;
         private string name;
+        private string tag;
 
         public IPhysicsComponent PhysicsComponent { get; private set; }
 
@@ -30,6 +31,10 @@ namespace TucanEngine.Main.GameLogic
         
         public string GetName() {
             return name;
+        }
+        
+        public string GetTag() {
+            return tag;
         }
         
         public int GetLayer() {
@@ -46,6 +51,10 @@ namespace TucanEngine.Main.GameLogic
         
         public void SetName(string name) {
             this.name = name;
+        }
+        
+        public void SetTag(string tag) {
+            this.tag = tag;
         }
 
         public T GetBehaviour<T>() where T : Behaviour {

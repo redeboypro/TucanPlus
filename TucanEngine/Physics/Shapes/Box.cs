@@ -118,12 +118,14 @@ namespace TucanEngine.Physics.Shapes
             fracDirection.Y = 1.0f / direction.Y;
             fracDirection.Z = 1.0f / direction.Z;
             
-            var distanceToMinX = (min.X - start.X) * fracDirection.X;
-            var distanceToMaxX = (max.X - start.X) * fracDirection.X;
-            var distanceToMinY = (min.Y - start.Y) * fracDirection.Y;
-            var distanceToMaxY = (max.Y - start.Y) * fracDirection.Y;
-            var distanceToMinZ = (min.Z - start.Z) * fracDirection.Z;
-            var distanceToMaxZ = (max.Z - start.Z) * fracDirection.Z;
+            var distanceToMinX = (sharedMin.X - start.X) * fracDirection.X;
+            var distanceToMaxX = (sharedMax.X - start.X) * fracDirection.X;
+            
+            var distanceToMinY = (sharedMin.Y - start.Y) * fracDirection.Y;
+            var distanceToMaxY = (sharedMax.Y - start.Y) * fracDirection.Y;
+            
+            var distanceToMinZ = (sharedMin.Z - start.Z) * fracDirection.Z;
+            var distanceToMaxZ = (sharedMax.Z - start.Z) * fracDirection.Z;
 
             var distanceToMin = Math.Max(Math.Max(
                     Math.Min(distanceToMinX, distanceToMaxX), 

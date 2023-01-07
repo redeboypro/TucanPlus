@@ -100,6 +100,7 @@ namespace TucanEngine.Scene
                     objectInstance.SetActive(false);
                     objectInstance.SetIndex(queue.Count);
                     objectInstance.SetName(source.GetName() + $"({i})");
+                    objectInstance.SetTag(pool.GetTag());
                     queue.Enqueue(objectInstance);
                 }
                 layers[source.GetLayer()].Add(pool.GetTag(), queue);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using TucanEngine.Common.Math;
@@ -205,19 +206,31 @@ namespace TucanEngine.Physics
             return distanceToIntersectionPoint >= 0;
         }
 
-        public static bool Raycast(Vector3 start, Vector3 direction, out (Vector3, IShape) hitInfo) {
-            hitInfo = (start + direction, null);
+        public static bool Raycast(Vector3 start, Vector3 direction, out (Vector3, IShape) hitInfo, IShape[] toIgnore = null) {
+            hitInfo = (start + direction * float.PositiveInfinity, null);
             var intersects = false;
             
             foreach (var shape in Shapes) {
+                var transform = (GameObject)shape.AssignedTransform;
+                
+                if (transform != null && !transform.IsActive()) {
+                    continue;
+                }
+                
+                if (toIgnore != null && toIgnore.Length > 0) {
+                    if (toIgnore.Contains(shape)) {
+                        continue;
+                    }
+                }
                 if (shape.Raycast(start, direction, out var hitPoint)) {
                     intersects = true;
+
                     if (Vector3.Distance(start, hitPoint) < Vector3.Distance(start, hitInfo.Item1)) {
                         hitInfo = (hitPoint, shape);
                     }
                 }
             }
-
+            
             return intersects;
         }
     }

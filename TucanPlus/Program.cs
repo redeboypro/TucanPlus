@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
+using OpenTK.Input;
 using TucanEngine.AssimpImplementation;
 using TucanEngine.Display;
+using TucanEngine.Gui;
+using TucanEngine.Main;
 using TucanEngine.Main.GameLogic;
 using TucanEngine.Main.GameLogic.BasicComponents;
 using TucanEngine.Main.GameLogic.Common;
@@ -18,15 +23,32 @@ namespace TucanPlus
         private const string TemporaryTag = "Temp";
         private const int PlatformCount = 10;
         
+        private static List<GameObject> platforms = new List<GameObject>();
+
         public static void Main(string[] args) {
             var display = new Display(800, 600, "Tucan Display", () => {
+                var guiSkin = new GuiSkin();
+                guiSkin.SetFont(new Texture2D("resources\\font.png"));
+                var guiManager = new GuiManager(guiSkin, new GuiShader());
                 var scene = new Scene();
                 var camera = scene.GetCamera();
 
                 Physics.Gravity = -10;
-                
+                var text = guiManager.Text(string.Empty);
+                text.WorldSpaceScale = new Vector3(0.6f, 0.4f, 1);
+                text.WorldSpaceLocation = new Vector3(0.25f, 0.4f, 0);
+
                 camera.AddBehaviour<BoxComponent>();
                 var box = camera.GetBehaviour<BoxComponent>();
+                box.MtdCorrection = (transform, direction) => {
+                    if (direction is Face.Up && transform == platforms.Last()) {
+                        text.SetText("You Win!");
+                    }
+                };
+                box.CollisionEnter = (transform, direction) => {
+                    //Console.WriteLine("Collision Enter");
+                };
+                
                 camera.AddBehaviour<BasicFirstPersonController>();
                 camera.AddBehaviour<GameController>();
 
@@ -45,8 +67,12 @@ namespace TucanPlus
 
                 var ran = new Random();
                 for (var i = 0; i < PlatformCount; i++) {
-                    scene.InstantiateFromPool(TemporaryTag, -3 * Vector3.UnitY + Vector3.UnitZ * i * 8, 
+                    var instance = scene.InstantiateFromPool(TemporaryTag,
+                        (ran.Next(0, 10) * 0.1f - 3) * Vector3.UnitY
+                        + Vector3.UnitZ * i * 8
+                        + Vector3.UnitX * ran.Next(-3, 3) * Math.Sign(i), 
                         Quaternion.FromEulerAngles(0, MathHelper.DegreesToRadians(ran.Next(0,180)), 0), Vector3.One);
+                    platforms.Add(instance);
                 }
             });
         }
@@ -54,16 +80,25 @@ namespace TucanPlus
         public class GameController : Behaviour
         {
             private GameObject gameObject;
-            
+            private BoxComponent boxComponent;
+
             public override void OnLoad(EventArgs e) {
                 base.OnLoad(e);
                 gameObject = GetAssignedObject();
+                boxComponent = gameObject.GetBehaviour<BoxComponent>();
             }
 
             public override void OnUpdateFrame(FrameEventArgs e) {
                 base.OnUpdateFrame(e);
                 if (gameObject.WorldSpaceLocation.Y < -7) {
                     gameObject.WorldSpaceLocation = Vector3.UnitY;
+                }
+
+                if (Input.IsMouseButtonDown(MouseButton.Left)) {
+                    if (Physics.Raycast(gameObject.WorldSpaceLocation, gameObject.Forward(), out var hitInfo,
+                        new IShape[] { boxComponent.GetBoxShape() })) {
+                        ((GameObject)hitInfo.Item2?.AssignedTransform)?.SetActive(false);
+                    }
                 }
             }
         }
