@@ -20,8 +20,8 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
 
         public override void OnUpdateFrame(FrameEventArgs e) {
             if (Input.IsAnyKeyDown()) {
-                cameraGameObject.WorldSpaceLocation += cameraGameObject.Forward() * (float)e.Time * MovementSpeed * Input.GetAxis("Vertical");
-                cameraGameObject.WorldSpaceLocation += cameraGameObject.Right() * (float)e.Time * MovementSpeed * Input.GetAxis("Horizontal");
+                cameraGameObject.WorldSpaceLocation += cameraGameObject.Forward(Space.Global) * (float)e.Time * MovementSpeed * Input.GetAxis("Vertical");
+                cameraGameObject.WorldSpaceLocation += cameraGameObject.Right(Space.Global) * (float)e.Time * MovementSpeed * Input.GetAxis("Horizontal");
                 
                 if (Input.IsKeyDown(Key.Space)) {
                     cameraGameObject.WorldSpaceLocation += Vector3.UnitY * (float)e.Time * MovementSpeed;
@@ -35,8 +35,8 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
             var pitch = Input.GetMouseDeltaY() * (float)e.Time * Sensitivity;
             var yaw = -Input.GetMouseDeltaX() * (float)e.Time * Sensitivity;
 
-            cameraGameObject.Rotate(Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(yaw)));
-            cameraGameObject.Rotate(Quaternion.FromAxisAngle(cameraGameObject.Right(), MathHelper.DegreesToRadians(pitch)));
+            cameraGameObject.Rotate(Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(yaw)), Space.Local);
+            cameraGameObject.Rotate(Quaternion.FromAxisAngle(cameraGameObject.Right(Space.Local), MathHelper.DegreesToRadians(pitch)), Space.Local);
         }
     }
 }

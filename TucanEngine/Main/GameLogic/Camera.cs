@@ -48,14 +48,11 @@ namespace TucanEngine.Main.GameLogic
             var worldSpaceLocation = vector.Transform(viewMatrix);
             var transformedLocation = Vector3.TransformPerspective(worldSpaceLocation, projection);
             return new Vector3((0.5f + 0.5f * transformedLocation.X) * display.Width,
-                (0.5f + (0.5f * -transformedLocation.Y)) * display.Height, transformedLocation.Z);
+                (0.5f + 0.5f * -transformedLocation.Y) * display.Height, transformedLocation.Z);
         }
 
         public Matrix4 GetViewMatrix() {
-            WorldSpaceRotation.Normalize();
-            var temporaryForward = WorldSpaceRotation * Vector3.UnitZ;
-            var temporaryUp = WorldSpaceRotation * Vector3.UnitY;
-            return Matrix4.LookAt(WorldSpaceLocation, WorldSpaceLocation + temporaryForward, temporaryUp);
+            return Matrix4.LookAt(WorldSpaceLocation, WorldSpaceLocation + Forward(Space.Global), Up(Space.Global)).Normalized();
         }
     }
 }

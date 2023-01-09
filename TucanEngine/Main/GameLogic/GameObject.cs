@@ -96,8 +96,12 @@ namespace TucanEngine.Main.GameLogic
         public void SetActive(bool isActive) {
             this.isActive = isActive;
             foreach (var behaviour in behaviours.Where(behaviour => behaviour.IsActive())) {
-                if (isActive) behaviour.OnObjectActivated(); 
-                else behaviour.OnObjectDeactivated();
+                if (isActive) {
+                    behaviour.OnObjectActivated();
+                }
+                else {
+                    behaviour.OnObjectDeactivated();
+                }
             }
         }
 
@@ -148,7 +152,7 @@ namespace TucanEngine.Main.GameLogic
         }
 
         public void OnUpdateFrame(FrameEventArgs e) {
-            ((Behaviour)PhysicsComponent).OnUpdateFrame(e);
+            ((Behaviour)PhysicsComponent)?.OnUpdateFrame(e);
             foreach (var behaviour in behaviours.Where(behaviour => behaviour.IsActive() && behaviour != (Behaviour)PhysicsComponent)) {
                 behaviour.OnUpdateFrame(e);
             }

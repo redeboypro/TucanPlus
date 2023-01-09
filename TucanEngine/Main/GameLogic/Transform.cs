@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OpenTK;
 using TucanEngine.Common.Math;
 
@@ -71,7 +72,7 @@ namespace TucanEngine.Main.GameLogic
         public Quaternion LocalSpaceRotation {
             get => localRotation;
             set {
-                localRotation = value;
+                localRotation = value.Normalized();
                 TransformMatrices(false);
                 OnRotating();
             }
@@ -126,8 +127,18 @@ namespace TucanEngine.Main.GameLogic
             if (this.parent != parent) {
                 this.parent?.RemoveChild(this);
             }
+
+            var location = globalLocation;
+            var rotation = globalRotation;
+            var scale = globalScale;
             this.parent = parent;
             TransformMatrices(false);
+            
+            globalLocation = location;
+            globalRotation = rotation;
+            globalScale = scale;
+            TransformMatrices(true);
+            
             parent?.AddChild(this);
         }
         
@@ -150,16 +161,34 @@ namespace TucanEngine.Main.GameLogic
             }
         }
         
-        public Vector3 Forward() {
-            return WorldSpaceRotation.Forward();
+        public Vector3 Forward(Space space) {
+            switch (space) {
+                case Space.Global:
+                    return WorldSpaceRotation.Forward();
+                case Space.Local: 
+                    return LocalSpaceRotation.Forward();
+                default: throw new Exception("Unknown space");
+            }
         }
         
-        public Vector3 Up() {
-            return WorldSpaceRotation.Up();
+        public Vector3 Up(Space space) {
+            switch (space) {
+                case Space.Global:
+                    return WorldSpaceRotation.Up();
+                case Space.Local: 
+                    return LocalSpaceRotation.Up();
+                default: throw new Exception("Unknown space");
+            }
         }
         
-        public Vector3 Right() {
-            return WorldSpaceRotation.Right();
+        public Vector3 Right(Space space) {
+            switch (space) {
+                case Space.Global:
+                    return WorldSpaceRotation.Right();
+                case Space.Local: 
+                    return LocalSpaceRotation.Right();
+                default: throw new Exception("Unknown space");
+            }
         }
 
         public void TransformMatrices(bool inverse) {
@@ -174,13 +203,15 @@ namespace TucanEngine.Main.GameLogic
                 globalScale = modelMatrix.ExtractScale();
             }
             else {
-                var localMatrix = parentMatrix.Inverted() * Matrix4.CreateScale(globalScale)
+                var localMatrix = Matrix4.CreateScale(globalScale)
                                                           * Matrix4.CreateFromQuaternion(globalRotation)
-                                                          * Matrix4.CreateTranslation(globalLocation);
+                                                          * Matrix4.CreateTranslation(globalLocation) * parentMatrix.Inverted();
 
-                LocalSpaceLocation = localMatrix.ExtractTranslation();
-                LocalSpaceRotation = localMatrix.ExtractRotation();
-                LocalSpaceScale = localMatrix.ExtractScale();
+                localLocation = localMatrix.ExtractTranslation();
+                localRotation = localMatrix.ExtractRotation();
+                localRotation.Normalize();
+                localScale = localMatrix.ExtractScale();
+                TransformMatrices(false);
             }
             
             UpdateChildren();
@@ -207,12 +238,20 @@ namespace TucanEngine.Main.GameLogic
             WorldSpaceRotation = MathBindings.GetLookRotation((target - WorldSpaceLocation).Normalized(), up);
         }
 
-        public void Rotate(Quaternion rotation) {
-            LocalSpaceRotation = rotation * localRotation;
+        public void Rotate(Quaternion rotation, Space space = Space.Global) {
+            switch (space) {
+                case Space.Global:
+                    WorldSpaceRotation = rotation * globalRotation;
+                    break;
+                case Space.Local: 
+                    LocalSpaceRotation = rotation * localRotation;
+                    break;
+                default: throw new Exception("Unknown space");
+            }
         }
         
-        public void Rotate(float angle, Vector3 axis) {
-            Rotate(Quaternion.FromAxisAngle(axis, angle));
+        public void Rotate(float angle, Vector3 axis, Space space = Space.Global) {
+            Rotate(Quaternion.FromAxisAngle(axis, angle), space);
         }
         
         public void Move(float deltaX, float deltaY, float deltaZ) {

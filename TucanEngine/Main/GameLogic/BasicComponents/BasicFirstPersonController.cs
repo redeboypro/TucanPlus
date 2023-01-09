@@ -3,6 +3,7 @@ using OpenTK;
 using OpenTK.Input;
 using TucanEngine.Common.Math;
 using TucanEngine.Main.GameLogic.Common;
+using TucanEngine.Physics;
 using TucanEngine.Physics.Components;
 
 namespace TucanEngine.Main.GameLogic.BasicComponents
@@ -29,10 +30,11 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
 
         public override void OnUpdateFrame(FrameEventArgs e) {
             if (Input.IsAnyKeyDown()) {
-                gameObject.WorldSpaceLocation += gameObject.Forward() * forwardCorrection * (float)e.Time * MovementSpeed * Input.GetAxis("Vertical");
-                gameObject.WorldSpaceLocation += gameObject.Right() * (float)e.Time * MovementSpeed * Input.GetAxis("Horizontal");
-                
-                if (Input.IsKeyDown(Key.Space) && boxComponent.IsGrounded()) {
+                gameObject.LocalSpaceLocation += gameObject.Forward(Space.Local) * forwardCorrection * (float)e.Time * MovementSpeed * Input.GetAxis("Vertical");
+                gameObject.LocalSpaceLocation += gameObject.Right(Space.Local) * (float)e.Time * MovementSpeed * Input.GetAxis("Horizontal");
+
+                var (collide, face) = boxComponent.CollideOther();
+                if (Input.IsKeyDown(Key.Space) && collide && face is Face.Up) {
                     boxComponent.TossUp(5);
                 }
             }
@@ -40,8 +42,8 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
             var pitch = Input.GetMouseDeltaY() * (float)e.Time * Sensitivity;
             var yaw = -Input.GetMouseDeltaX() * (float)e.Time * Sensitivity;
 
-            gameObject.Rotate(Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(yaw)));
-            gameObject.Rotate(Quaternion.FromAxisAngle(gameObject.Right(), MathHelper.DegreesToRadians(pitch)));
+            gameObject.Rotate(Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(yaw)), Space.Local);
+            gameObject.Rotate(Quaternion.FromAxisAngle(gameObject.Right(Space.Local), MathHelper.DegreesToRadians(pitch)), Space.Local);
         }
     }
 }

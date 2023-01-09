@@ -33,24 +33,14 @@ namespace TucanPlus
                 var scene = new Scene();
                 var camera = scene.GetCamera();
 
+                var player = new GameObject();
+                player.LocalSpaceScale *= 1.8f;
+
                 Physics.Gravity = -10;
                 var text = guiManager.Text(string.Empty);
                 text.WorldSpaceScale = new Vector3(0.6f, 0.4f, 1);
                 text.WorldSpaceLocation = new Vector3(0.25f, 0.4f, 0);
-
-                camera.AddBehaviour<BoxComponent>();
-                var box = camera.GetBehaviour<BoxComponent>();
-                box.MtdCorrection = (transform, direction) => {
-                    if (direction is Face.Up && transform == platforms.Last()) {
-                        text.SetText("You Win!");
-                    }
-                };
-                box.CollisionEnter = (transform, direction) => {
-                    //Console.WriteLine("Collision Enter");
-                };
-                
-                camera.AddBehaviour<BasicFirstPersonController>();
-                camera.AddBehaviour<GameController>();
+                scene.PushPool("Player", player, 1);
 
                 var meshRenderer = new MeshRenderer();
                 meshRenderer.SetMesh(ModelLoader.LoadMeshFromFile("grassPlatform.obj"));
@@ -64,6 +54,24 @@ namespace TucanPlus
 
                 scene.PushPool(TemporaryTag, model, 10);
                 scene.FillPools();
+                var playerInstance =
+                    scene.InstantiateFromPool("Player", Vector3.UnitY, Quaternion.Identity, new Vector3(1, 1.8f, 1));
+                camera.SetParent(playerInstance);
+                camera.LocalSpaceLocation = Vector3.UnitY * 0.5f;
+                
+                playerInstance.AddBehaviour<BoxComponent>();
+                var box = playerInstance.GetBehaviour<BoxComponent>();
+                box.CollisionEnter = (transform, direction) => {
+                    if (direction is Face.Up && transform == platforms.Last()) {
+                        text.SetText("You Win!");
+                    }
+                    playerInstance.SetParent(transform);
+                };
+                box.CollisionExit = (transform, direction) => {
+                    playerInstance.SetParent(transform);
+                };
+                playerInstance.AddBehaviour<BasicFirstPersonController>();
+                playerInstance.AddBehaviour<GameController>();
 
                 var ran = new Random();
                 for (var i = 0; i < PlatformCount; i++) {
@@ -86,16 +94,21 @@ namespace TucanPlus
                 base.OnLoad(e);
                 gameObject = GetAssignedObject();
                 boxComponent = gameObject.GetBehaviour<BoxComponent>();
+                gameObject.WorldSpaceLocation = platforms[0].WorldSpaceLocation + Vector3.UnitY;
             }
 
             public override void OnUpdateFrame(FrameEventArgs e) {
                 base.OnUpdateFrame(e);
-                if (gameObject.WorldSpaceLocation.Y < -7) {
-                    gameObject.WorldSpaceLocation = Vector3.UnitY;
+                if (gameObject.WorldSpaceLocation.Y < -12) {
+                    gameObject.LocalSpaceLocation = Vector3.UnitY;
+                }
+
+                foreach (var platform in platforms) {
+                    platform.Rotate((float)e.Time, Vector3.UnitY);
                 }
 
                 if (Input.IsMouseButtonDown(MouseButton.Left)) {
-                    if (Physics.Raycast(gameObject.WorldSpaceLocation, gameObject.Forward(), out var hitInfo,
+                    if (Physics.Raycast(gameObject.WorldSpaceLocation, gameObject.Forward(Space.Global), out var hitInfo,
                         new IShape[] { boxComponent.GetBoxShape() })) {
                         ((GameObject)hitInfo.Item2?.AssignedTransform)?.SetActive(false);
                     }
