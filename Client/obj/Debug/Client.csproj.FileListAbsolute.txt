@@ -1,6 +1,0 @@
-E:\Development\RiderIDE\Projects\TucanPlus\Client\bin\Debug\Client.exe
-E:\Development\RiderIDE\Projects\TucanPlus\Client\bin\Debug\Client.pdb
-E:\Development\RiderIDE\Projects\TucanPlus\Client\obj\Debug\Client.csprojAssemblyReference.cache
-E:\Development\RiderIDE\Projects\TucanPlus\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
-E:\Development\RiderIDE\Projects\TucanPlus\Client\obj\Debug\Client.exe
-E:\Development\RiderIDE\Projects\TucanPlus\Client\obj\Debug\Client.pdb

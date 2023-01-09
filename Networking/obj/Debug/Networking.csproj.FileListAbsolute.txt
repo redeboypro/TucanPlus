@@ -1,6 +1,0 @@
-E:\Development\RiderIDE\Projects\TucanPlus\Networking\bin\Debug\Networking.exe
-E:\Development\RiderIDE\Projects\TucanPlus\Networking\bin\Debug\Networking.pdb
-E:\Development\RiderIDE\Projects\TucanPlus\Networking\obj\Debug\Networking.csprojAssemblyReference.cache
-E:\Development\RiderIDE\Projects\TucanPlus\Networking\obj\Debug\Networking.csproj.CoreCompileInputs.cache
-E:\Development\RiderIDE\Projects\TucanPlus\Networking\obj\Debug\Networking.exe
-E:\Development\RiderIDE\Projects\TucanPlus\Networking\obj\Debug\Networking.pdb
