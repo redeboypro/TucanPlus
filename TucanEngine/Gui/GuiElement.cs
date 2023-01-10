@@ -11,14 +11,14 @@ using TucanEngine.Main.GameLogic.Common;
 namespace TucanEngine.Gui
 {
     public enum Orientation { Horizontal, Vertical }
-    public enum GuiEvent { Press, Release, Drag }
-    public delegate void MouseMovingEvent(MouseMoveEventArgs e);
+    public enum GuiEventType { Press, Release, Drag }
+    public delegate void GuiEvent(object args);
     public abstract class GuiElement : Transform, IBehaviour
     {
-        private readonly Dictionary<GuiEvent, List<object>> GuiEvents = new Dictionary<GuiEvent, List<object>> {
-            { GuiEvent.Press , new List<object>() },
-            { GuiEvent.Release, new List<object>() },
-            { GuiEvent.Drag, new List<object>() }
+        private readonly Dictionary<GuiEventType, List<GuiEvent>> GuiEvents = new Dictionary<GuiEventType, List<GuiEvent>> {
+            { GuiEventType.Press , new List<GuiEvent>() },
+            { GuiEventType.Release, new List<GuiEvent>() },
+            { GuiEventType.Drag, new List<GuiEvent>() }
         };
 
         private Color4 color = Color4.White;
@@ -45,17 +45,10 @@ namespace TucanEngine.Gui
         public bool IsHighlighted() {
             return isHighlighted;
         }
-        
-        public override void OnMoving() { }
-        
-        public override void OnRotating() { }
-        
-        public override void OnScaling() { }
 
-        public override void OnTransformMatrices() {
+        protected override void OnTransformMatrices() {
             base.OnTransformMatrices();
             RecalculateBounds();
-            InvokeInChildren(nameof(OnTransformMatrices));
         }
 
         public virtual void OnKeyDown(KeyboardKeyEventArgs e) {
@@ -88,7 +81,7 @@ namespace TucanEngine.Gui
         
         public virtual void OnMouseMove(MouseMoveEventArgs e) {
             if (isPressed) {
-                OnDrag();
+                OnDrag(e);
             }
             
             if (MouseIsInsideBounds(e)) {
@@ -110,24 +103,22 @@ namespace TucanEngine.Gui
         }
 
         public virtual void OnPress() {
-            foreach (var action in GuiEvents[GuiEvent.Press]) {
-                ((Action)action)?.Invoke();
+            foreach (var action in GuiEvents[GuiEventType.Press]) {
+                action?.Invoke(null);
             }
             InvokeInChildren(nameof(OnPress));
         }
         
         public virtual void OnRelease() {
-            foreach (var action in GuiEvents[GuiEvent.Release]) {
-                ((Action)action)?.Invoke();
+            foreach (var action in GuiEvents[GuiEventType.Release]) {
+                action?.Invoke(null);
             }
-            InvokeInChildren(nameof(OnRelease));
         }
         
-        public virtual void OnDrag() {
-            foreach (var action in GuiEvents[GuiEvent.Drag]) {
-                ((Action)action)?.Invoke();
+        public virtual void OnDrag(MouseMoveEventArgs moveEventArgs) {
+            foreach (var action in GuiEvents[GuiEventType.Drag]) {
+                action?.Invoke(moveEventArgs);
             }
-            InvokeInChildren(nameof(OnDrag));
         }
 
         public virtual void OnLoad(EventArgs e) {
@@ -149,15 +140,18 @@ namespace TucanEngine.Gui
             }
 
             InvokeInChildren(nameof(OnRenderFrame), e);
-            if (IsMasked) GL.Disable(EnableCap.ScissorTest);
+            
+            if (IsMasked) {
+                GL.Disable(EnableCap.ScissorTest);
+            }
         }
         
-        public void AddExpandingEvent(Action action, GuiEvent guiEventType) {
-            GuiEvents[guiEventType].Add(action);
+        public void AddExpandingEvent(GuiEvent guiEvent, GuiEventType guiEventType) {
+            GuiEvents[guiEventType].Add(guiEvent);
         }
         
-        public void RemoveExpandingEvent(Action action, GuiEvent guiEventType) {
-            GuiEvents[guiEventType].Add(action);
+        public void RemoveExpandingEvent(GuiEvent guiEvent, GuiEventType guiEventType) {
+            GuiEvents[guiEventType].Add(guiEvent);
         }
         
         public virtual void OnFocus() { }

@@ -15,8 +15,7 @@ namespace TucanEngine.Gui
         private readonly Texture2D textureData;
         private readonly List<GlArrayData> VAOs = new List<GlArrayData>();
 
-        public Font(Texture2D textureData)
-        {
+        public Font(Texture2D textureData) {
             this.textureData = textureData;
             var textureCoords = (float[]) PrimitiveData.QuadPositions.Clone();
             

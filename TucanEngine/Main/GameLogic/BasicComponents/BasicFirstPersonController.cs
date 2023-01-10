@@ -23,9 +23,6 @@ namespace TucanEngine.Main.GameLogic.BasicComponents
             boxComponent = gameObject.GetBehaviour<BoxComponent>();
             boxComponent.GetBoxShape().IgnoreRotation = true;
             boxComponent.IgnoreGravity = false;
-            
-            Display.Display.GetCurrentDisplay().CursorGrabbed = true;
-            Display.Display.GetCurrentDisplay().CursorVisible = false;
         }
 
         public override void OnUpdateFrame(FrameEventArgs e) {

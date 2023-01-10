@@ -12,7 +12,7 @@ namespace TucanEngine.Gui
     {
         private const float ThumbScaleFactor = 0.1f;
         private const float BaseScaleFactor = 2.0f;
-        private const float ThresholdFactor = 0.01f;
+        private const float ThresholdFactor = 0.25f;
         
         private readonly float minValue;
         private readonly float maxValue;
@@ -34,13 +34,14 @@ namespace TucanEngine.Gui
             var guiManager = GuiManager.GetCurrentManagerInstance();
             thumb = guiManager.Image(guiManager.GetSkin().GetThumbTexture(), true);
             thumb.SetParent(this);
-            thumb.AddExpandingEvent(() => {
+            thumb.AddExpandingEvent(args => {
+                var mouseMoveEventArgs = (MouseMoveEventArgs)args;
                 AddValue(
-                    orientation == Orientation.Horizontal ? Input.GetMouseDeltaX() * ThresholdFactor :
-                    orientation == Orientation.Vertical ? Input.GetMouseDeltaY() * ThresholdFactor * -additionValueSign :
+                    orientation == Orientation.Horizontal ? mouseMoveEventArgs.XDelta * ThresholdFactor :
+                    orientation == Orientation.Vertical ? mouseMoveEventArgs.Y * ThresholdFactor * -additionValueSign :
                     throw new Exception("Unknown orientation"));
                 valueChangingEvent?.Invoke();
-            }, GuiEvent.Drag);
+            }, GuiEventType.Drag);
             RecalculateBounds();
         }
 
@@ -51,12 +52,12 @@ namespace TucanEngine.Gui
             thumbTranslationUnit = BaseScaleFactor / (maxValue - minValue);
         }
 
-        public override void OnScaling() {
+        protected override void OnScaling() {
             RecalculateBounds();
             SetThumbStartLocation();
         }
-        
-        public override void OnRotating() {
+
+        protected override void OnRotating() {
             RecalculateBounds();
             SetThumbStartLocation();
             additionValueSign = Sign(MathHelper.RadiansToDegrees(GetRotationAngle()));
@@ -67,8 +68,7 @@ namespace TucanEngine.Gui
         }
         
         private void SetThumbLocationByValue() {
-            thumb.LocalSpaceLocation = -Vector3.UnitX + Vector3.Zero
-                .SetUnit(thumbTranslationUnit * (currentValue - minValue), Axis.X);
+            thumb.LocalSpaceLocation = new Vector3(thumbTranslationUnit * (currentValue - minValue) - 1.0f, 0.0f, 0.0f);
         }
 
         private static int Sign(float value) {

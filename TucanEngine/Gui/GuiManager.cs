@@ -47,10 +47,10 @@ namespace TucanEngine.Gui
             return guiElement;
         }
         
-        public Image2D Button(GuiElement content, Action e) {
+        public Image2D Button(GuiElement content, GuiEvent e) {
             var guiElement = Image(skin.GetThumbTexture(), true);
             content.SetParent(guiElement);
-            guiElement.AddExpandingEvent(e, GuiEvent.Press);
+            guiElement.AddExpandingEvent(e, GuiEventType.Press);
             return guiElement;
         }
         
@@ -106,8 +106,7 @@ namespace TucanEngine.Gui
 
         public void OnRenderFrame(FrameEventArgs e) {
             GL.Disable(EnableCap.DepthTest);
-            foreach (var element in guiElements)
-            {
+            foreach (var element in guiElements) {
                 if (element != null && element.GetParent() == null) {
                     element.OnRenderFrame(e);
                 }

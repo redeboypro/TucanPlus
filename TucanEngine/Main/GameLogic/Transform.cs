@@ -26,7 +26,7 @@ namespace TucanEngine.Main.GameLogic
             get => globalLocation;
             set {
                 globalLocation = value;
-                TransformMatrices(true);
+                TransformMatrices(Space.Global);
                 OnMoving();
             }
         }
@@ -35,7 +35,7 @@ namespace TucanEngine.Main.GameLogic
             get => globalRotation;
             set {
                 globalRotation = value;
-                TransformMatrices(true);
+                TransformMatrices(Space.Global);
                 OnRotating();
             }
         }
@@ -44,7 +44,7 @@ namespace TucanEngine.Main.GameLogic
             get => globalRotation.ToEulerAngles();
             set {
                 WorldSpaceRotation = Quaternion.FromEulerAngles(value);
-                TransformMatrices(false);
+                TransformMatrices(Space.Local);
                 OnRotating();
             }
         }
@@ -53,7 +53,7 @@ namespace TucanEngine.Main.GameLogic
             get => globalScale;
             set {
                 globalScale = value;
-                TransformMatrices(true);
+                TransformMatrices(Space.Global);
                 OnScaling();
             }
         }
@@ -64,7 +64,7 @@ namespace TucanEngine.Main.GameLogic
             get => localLocation;
             set {
                 localLocation = value;
-                TransformMatrices(false);
+                TransformMatrices(Space.Local);
                 OnMoving();
             }
         }
@@ -73,7 +73,7 @@ namespace TucanEngine.Main.GameLogic
             get => localRotation;
             set {
                 localRotation = value.Normalized();
-                TransformMatrices(false);
+                TransformMatrices(Space.Local);
                 OnRotating();
             }
         }
@@ -82,7 +82,7 @@ namespace TucanEngine.Main.GameLogic
             get => localRotation.ToEulerAngles();
             set {
                 localRotation = Quaternion.FromEulerAngles(value);
-                TransformMatrices(false);
+                TransformMatrices(Space.Local);
                 OnRotating();
             }
         }
@@ -91,14 +91,14 @@ namespace TucanEngine.Main.GameLogic
             get => localScale;
             set {
                 localScale = value;
-                TransformMatrices(false);
+                TransformMatrices(Space.Local);
                 OnScaling();
             }
         }
         #endregion
 
         public Transform() {
-            TransformMatrices(false);
+            TransformMatrices(Space.Local);
         }
         
         public int GetChildCount() {
@@ -132,12 +132,12 @@ namespace TucanEngine.Main.GameLogic
             var rotation = globalRotation;
             var scale = globalScale;
             this.parent = parent;
-            TransformMatrices(false);
+            TransformMatrices(Space.Local);
             
             globalLocation = location;
             globalRotation = rotation;
             globalScale = scale;
-            TransformMatrices(true);
+            TransformMatrices(Space.Global);
             
             parent?.AddChild(this);
         }
@@ -191,36 +191,40 @@ namespace TucanEngine.Main.GameLogic
             }
         }
 
-        public void TransformMatrices(bool inverse) {
+        public void TransformMatrices(Space space) {
             var parentMatrix = GetParentMatrix();
-            if (!inverse) {
-                modelMatrix = Matrix4.CreateScale(localScale)
-                              * Matrix4.CreateFromQuaternion(localRotation)
-                              * Matrix4.CreateTranslation(localLocation) * parentMatrix;
+            switch (space) {
+                case Space.Local:
+                    modelMatrix = Matrix4.CreateScale(localScale)
+                                  * Matrix4.CreateFromQuaternion(localRotation)
+                                  * Matrix4.CreateTranslation(localLocation) * parentMatrix;
 
-                globalLocation = modelMatrix.ExtractTranslation();
-                globalRotation = modelMatrix.ExtractRotation();
-                globalScale = modelMatrix.ExtractScale();
-            }
-            else {
-                var localMatrix = Matrix4.CreateScale(globalScale)
-                                                          * Matrix4.CreateFromQuaternion(globalRotation)
-                                                          * Matrix4.CreateTranslation(globalLocation) * parentMatrix.Inverted();
+                    globalLocation = modelMatrix.ExtractTranslation();
+                    globalRotation = modelMatrix.ExtractRotation();
+                    globalScale = modelMatrix.ExtractScale();
+                    break;
+                case Space.Global:
+                    var localMatrix = Matrix4.CreateScale(globalScale)
+                                      * Matrix4.CreateFromQuaternion(globalRotation)
+                                      * Matrix4.CreateTranslation(globalLocation) * parentMatrix.Inverted();
 
-                localLocation = localMatrix.ExtractTranslation();
-                localRotation = localMatrix.ExtractRotation();
-                localRotation.Normalize();
-                localScale = localMatrix.ExtractScale();
-                TransformMatrices(false);
+                    localLocation = localMatrix.ExtractTranslation();
+                    localRotation = localMatrix.ExtractRotation();
+                    localRotation.Normalize();
+                    localScale = localMatrix.ExtractScale();
+                    TransformMatrices(Space.Local);
+                    break;
+                default: 
+                    throw new Exception("Unknown space");
             }
-            
+
             UpdateChildren();
             OnTransformMatrices();
         }
 
         public void UpdateChildren() {
             foreach (var child in children) {
-                child.TransformMatrices(false);
+                child.TransformMatrices(Space.Local);
             }
         }
 
@@ -262,9 +266,9 @@ namespace TucanEngine.Main.GameLogic
             LocalSpaceLocation += delta;
         }
 
-        public virtual void OnMoving() { }
-        public virtual void OnRotating() { }
-        public virtual void OnScaling() { }
-        public virtual void OnTransformMatrices() { }
+        protected virtual void OnMoving() { }
+        protected virtual void OnRotating() { }
+        protected virtual void OnScaling() { }
+        protected virtual void OnTransformMatrices() { }
     }
 }

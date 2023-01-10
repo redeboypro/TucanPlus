@@ -28,19 +28,40 @@ namespace TucanPlus
         public static void Main(string[] args) {
             var display = new Display(800, 600, "Tucan Display", () => {
                 var guiSkin = new GuiSkin();
-                guiSkin.SetFont(new Texture2D("resources\\font.png"));
+                guiSkin.SetFont(new Texture2D("resources/font.png"));
+                guiSkin.SetBoxTexture(new Texture2D("resources/box.png"));
+                guiSkin.SetThumbTexture(new Texture2D("resources/thumb.png"));
                 var guiManager = new GuiManager(guiSkin, new GuiShader());
-                var scene = new Scene();
-                var camera = scene.GetCamera();
-
-                var player = new GameObject();
-                player.LocalSpaceScale *= 1.8f;
-
-                Physics.Gravity = -10;
+                var slider = guiManager.Slider(0, 100);
+                slider.WorldSpaceScale = new Vector3(0.6f, 0.1f, 1.0f);
+                slider.WorldSpaceLocation = new Vector3(0, 0.5f, 0);
+                slider.SetValueChangingEvent(() => {
+                    Console.WriteLine(slider.GetValue());
+                });
                 var text = guiManager.Text(string.Empty);
                 text.WorldSpaceScale = new Vector3(1f, 0.4f, 1);
                 text.WorldSpaceLocation = new Vector3(-0.5f, 0.4f, 0);
-                scene.PushPool("Player", player, 1);
+                
+                var scene = new Scene();
+                
+                var camera = scene.GetCamera();
+                camera.AddBehaviour<BoxComponent>();
+                
+                var box = camera.GetBehaviour<BoxComponent>();
+                box.CollisionEnter = (transform, direction) => {
+                    if (direction is Face.Up && transform == platforms.Last()) {
+                        text.SetText("You Win!");
+                    }
+                    camera.SetParent(transform);
+                };
+                box.CollisionExit = (transform, direction) => {
+                    camera.SetParent(transform);
+                };
+                
+                camera.AddBehaviour<BasicFirstPersonController>();
+                camera.AddBehaviour<GameController>();
+
+                Physics.Gravity = -10;
 
                 var meshRenderer = new MeshRenderer();
                 meshRenderer.SetMesh(ModelLoader.LoadMeshFromFile("grassPlatform.obj"));
@@ -54,24 +75,6 @@ namespace TucanPlus
 
                 scene.PushPool(TemporaryTag, model, 10);
                 scene.FillPools();
-                var playerInstance =
-                    scene.InstantiateFromPool("Player", Vector3.UnitY, Quaternion.Identity, new Vector3(1, 1.8f, 1));
-                camera.SetParent(playerInstance);
-                camera.LocalSpaceLocation = Vector3.UnitY * 0.5f;
-                
-                playerInstance.AddBehaviour<BoxComponent>();
-                var box = playerInstance.GetBehaviour<BoxComponent>();
-                box.CollisionEnter = (transform, direction) => {
-                    if (direction is Face.Up && transform == platforms.Last()) {
-                        text.SetText("You Win!");
-                    }
-                    playerInstance.SetParent(transform);
-                };
-                box.CollisionExit = (transform, direction) => {
-                    playerInstance.SetParent(transform);
-                };
-                playerInstance.AddBehaviour<BasicFirstPersonController>();
-                playerInstance.AddBehaviour<GameController>();
 
                 var ran = new Random();
                 for (var i = 0; i < PlatformCount; i++) {
@@ -107,12 +110,12 @@ namespace TucanPlus
                     platform.Rotate((float)e.Time, Vector3.UnitY);
                 }
 
-                if (Input.IsMouseButtonDown(MouseButton.Left)) {
+                /*if (Input.IsMouseButtonDown(MouseButton.Left)) {
                     if (Physics.Raycast(gameObject.WorldSpaceLocation, gameObject.Forward(Space.Global), out var hitInfo,
                         new IShape[] { boxComponent.GetBoxShape() })) {
                         ((GameObject)hitInfo.Item2?.AssignedTransform)?.SetActive(false);
                     }
-                }
+                }*/
             }
         }
     }
