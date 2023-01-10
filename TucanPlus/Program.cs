@@ -38,8 +38,8 @@ namespace TucanPlus
 
                 Physics.Gravity = -10;
                 var text = guiManager.Text(string.Empty);
-                text.WorldSpaceScale = new Vector3(0.6f, 0.4f, 1);
-                text.WorldSpaceLocation = new Vector3(0.25f, 0.4f, 0);
+                text.WorldSpaceScale = new Vector3(1f, 0.4f, 1);
+                text.WorldSpaceLocation = new Vector3(-0.5f, 0.4f, 0);
                 scene.PushPool("Player", player, 1);
 
                 var meshRenderer = new MeshRenderer();

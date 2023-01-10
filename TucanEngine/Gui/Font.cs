@@ -12,8 +12,8 @@ namespace TucanEngine.Gui
         public const string CharSheet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-=_+[]{}\\|;:'\".,<>/?`~ ";
         public static readonly char[] Chars = CharSheet.ToCharArray();
 
-        private Texture2D textureData;
-        private List<GlArrayData> VAOs = new List<GlArrayData>();
+        private readonly Texture2D textureData;
+        private readonly List<GlArrayData> VAOs = new List<GlArrayData>();
 
         public Font(Texture2D textureData)
         {
@@ -37,7 +37,7 @@ namespace TucanEngine.Gui
                 textureCoords[3] = textureCoords[7] = bottom;
 
                 var arrayData = new GlArrayData();
-                arrayData.Push(0, 2, PrimitiveData.QuadPositions, BufferTarget.ArrayBuffer);
+                arrayData.Push(0, 2, PrimitiveData.CharPositions, BufferTarget.ArrayBuffer);
                 arrayData.Push(1, 2, textureCoords, BufferTarget.ArrayBuffer);
                 arrayData.Create();
                 

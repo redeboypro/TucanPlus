@@ -16,6 +16,13 @@
         #endregion
 
         #region [ 2D Primitives ]
+        public static readonly float[] CharPositions = {
+            0.0f, 1.0f,
+            0.0f, 0.0f,
+            1.0f, 1.0f,
+            1.0f, 0.0f
+        };
+        
         public static readonly float[] QuadPositions = {
             -1.0f, 1.0f,
             -1.0f, -1.0f,
